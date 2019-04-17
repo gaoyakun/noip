@@ -3,6 +3,9 @@
 #include <algorithm>
 #include <cstdlib>
 #include <ctime>
+#include "SegmentTree.h"
+#include "BinaryIndexedTree.h"
+
 using std::cin;
 using std::cout;
 using std::endl;
@@ -56,147 +59,65 @@ public:
     }
 };
 
-class PartialSumTest: public Test {
-    vector<int> A;
+class BITTest: public Test {
+    BIT<int> bit;
 public:
     virtual void init (size_t size) {
-        A.resize (size + 1, 0);
+        bit.init(size);
     }
     virtual size_t count () const {
-        return A.size() - 1;
+        return bit.count();
     }
     virtual void singleAdd (size_t pos, int d) {
-        for (size_t i = pos; i < A.size(); i++) {
-            A[i] += d;
-        }
+        bit.singleAdd (pos, d);
     }
     virtual void rangeAdd (size_t posStart, size_t posEnd, int d) {
-        for (size_t i = posStart; i <= posEnd; i++) {
-            A[i] += (i - posStart + 1) * d;
-        }
-        int k = (posEnd - posStart + 1) * d;
-        for (size_t i = posEnd + 1; i < A.size(); i++) {
-            A[i] += k;
-        }
+        bit.rangeAdd (posStart, posEnd, d);
     }
     virtual int sum (size_t n) const {
-        return A[n];
+        return bit.sum (n);
     }
     virtual int singleQuery (size_t pos) const {
-        return A[pos] - A[pos-1];
+        return bit.singleQuery (pos);
     }
     virtual int rangeQuery (size_t posStart, size_t posEnd) const {
-        return A[posEnd] - A[posStart-1];
+        return bit.rangeQuery (posStart, posEnd);
     }
 };
 
-class BaseBITTest: public Test {
-    vector<int> C;
+class SegmentTreeTest: public Test {
+    SegmentTree<int> st;
 public:
     virtual void init (size_t size) {
-        C.resize (size + 1, 0);
+        st.init (size);
     }
     virtual size_t count () const {
-        return C.size() - 1;
+        return st.count ();
     }
     virtual void singleAdd (size_t pos, int d) {
-        size_t count = C.size();
-        while (pos <= count) {
-            C[pos] += d;
-            pos += pos & -pos;
-        }
+        return st.singleAdd (pos, d);
     }
     virtual void rangeAdd (size_t posStart, size_t posEnd, int d) {
-        for (size_t i = posStart; i <= posEnd; i++) {
-            singleAdd (i, d);
-        }
-    }
-    virtual int sum (size_t n) const {
-        int result = 0;
-        while (n) {
-            result += C[n];
-            n -= n & -n;
-        }
-        return result;
-    }
-    virtual int singleQuery (size_t pos) const {
-        return sum(pos) - sum(pos-1);
-    }
-    virtual int rangeQuery (size_t posStart, size_t posEnd) const {
-        return sum(posEnd) - sum(posStart-1);
-    }
-};
-
-class DiffBITTest: public Test {
-    BaseBITTest baseBIT;
-public:
-    virtual void init (size_t size) {
-        baseBIT.init(size);
-    }
-    virtual size_t count () const {
-        return baseBIT.count();
-    }
-    virtual void singleAdd (size_t pos, int d) {
-        rangeAdd (pos, pos, d);
-    }
-    virtual void rangeAdd (size_t posStart, size_t posEnd, int d) {
-        baseBIT.singleAdd (posStart, d);
-        baseBIT.singleAdd (posEnd+1, -d);
+        st.rangeAdd (posStart, posEnd, d);
     }
     virtual int sum (size_t n) const {
         return rangeQuery (1, n);
     }
     virtual int singleQuery (size_t pos) const {
-        return baseBIT.sum (pos);
+        return st.singleQuery (pos);
     }
     virtual int rangeQuery (size_t posStart, size_t posEnd) const {
-        int result = 0;
-        for (size_t i = posStart; i <= posEnd; i++) {
-            result += singleQuery (i);
-        }
-        return result;
+        return st.rangeQuery (posStart, posEnd);
     }
 };
 
-class Diff2BITTest: public Test {
-    BaseBITTest baseBIT1;
-    BaseBITTest baseBIT2;
-public:
-    virtual void init (size_t size) {
-        baseBIT1.init(size);
-        baseBIT2.init(size);
-    }
-    virtual size_t count () const {
-        return baseBIT1.count();
-    }
-    virtual void singleAdd (size_t pos, int d) {
-        rangeAdd (pos, pos, d);
-    }
-    virtual void rangeAdd (size_t posStart, size_t posEnd, int d) {
-        baseBIT1.singleAdd (posStart, d);
-        baseBIT1.singleAdd (posEnd+1, -d);
-        baseBIT2.singleAdd (posStart, d * posStart);
-        baseBIT2.singleAdd (posEnd+1, -d * (posEnd+1));
-    }
-    virtual int sum (size_t n) const {
-        return (n + 1) * baseBIT1.sum(n) - baseBIT2.sum(n);
-    }
-    virtual int singleQuery (size_t pos) const {
-        return rangeQuery (pos, pos);
-    }
-    virtual int rangeQuery (size_t posStart, size_t posEnd) const {
-        return sum (posEnd) - sum (posStart-1);
-    }
-};
-
-inline bool randTest (Test *tests[], size_t numTests) {
-    size_t count = tests[0]->count();
-    int t = randRange (1, 5);
+inline bool randTest (const vector<int> &cases, size_t &caseStart, Test *tests[], size_t numTests, size_t count) {
+    int t = cases[caseStart++];
     switch (t) {
     case 1:
         {
-            size_t pos = randRange (1, count);
-            int d = rand ();
+            size_t pos = cases[caseStart++];
+            int d = cases[caseStart++];
             for (size_t i = 0; i < numTests; i++) {
                 tests[i]->singleAdd (pos, d);
             }
@@ -204,12 +125,9 @@ inline bool randTest (Test *tests[], size_t numTests) {
         }
     case 2:
         {
-            size_t posStart = randRange (1, count);
-            size_t posEnd = randRange (1, count);     
-            if (posStart > posEnd) {
-                swap (posStart, posEnd);
-            }       
-            int d = rand ();
+            size_t posStart = cases[caseStart++];
+            size_t posEnd = cases[caseStart++];     
+            int d = cases[caseStart++];
             for (size_t i = 0; i < numTests; i++) {
                 tests[i]->rangeAdd (posStart, posEnd, d);
             }
@@ -217,7 +135,7 @@ inline bool randTest (Test *tests[], size_t numTests) {
         }
     case 3:
         {
-            size_t n = randRange (1, count);
+            size_t n = cases[caseStart++];
             int k = tests[0]->sum (n);
             for (size_t i = 1; i < numTests; i++) {
                 if (k != tests[i]->sum (n)) {
@@ -228,7 +146,7 @@ inline bool randTest (Test *tests[], size_t numTests) {
         }
     case 4:
         {
-            size_t pos = randRange (1, count);
+            size_t pos = cases[caseStart++];
             int k = tests[0]->singleQuery (pos);
             for (size_t i = 1; i < numTests; i++) {
                 if (k != tests[i]->singleQuery (pos)) {
@@ -239,11 +157,8 @@ inline bool randTest (Test *tests[], size_t numTests) {
         }
     case 5:
         {
-            size_t posStart = randRange (1, count);
-            size_t posEnd = randRange (1, count);
-            if (posStart > posEnd) {
-                swap (posStart, posEnd);
-            }
+            size_t posStart = cases[caseStart++];
+            size_t posEnd = cases[caseStart++];
             int k = tests[0]->rangeQuery (posStart, posEnd);
             for (size_t i = 1; i < numTests; i++) {
                 if (k != tests[i]->rangeQuery (posStart, posEnd)) {
@@ -257,22 +172,18 @@ inline bool randTest (Test *tests[], size_t numTests) {
 }
 
 int main () {
-    const size_t count = 100000;
-    const size_t times = 500000;
+    const size_t count = 1000000;
+    const size_t times = 1000000;
     srand (clock ());
     Test *tests[] = {
         new BruteForceTest,
-        new PartialSumTest,
-        new BaseBITTest,
-        new DiffBITTest,
-        new Diff2BITTest,
+        new BITTest,
+        new SegmentTreeTest
     };
     const char *testNames[] = {
         "BruteForce",
-        "PartialSum",
-        "BaseBIT",
-        "DiffBIT",
-        "Diff2BIT"
+        "BIT",
+        "SegmentTree"
     };
     const size_t numTests = sizeof(tests)/sizeof(tests[0]);
     for (size_t i = 0; i < numTests; i++) {
@@ -280,18 +191,55 @@ int main () {
     }
 
     cout << "Testing " << count << " numbers for " << times << " times" << endl;
-    for (size_t i = 0; i < count; i++) {
-        int k = randRange (1, 1000000);
-        for (size_t j = 0; j < numTests; j++) {
-            tests[j]->singleAdd (i+1, k);
+    vector<int> cases;
+    for (size_t i = 0; i < times; i++) {
+        int t = randRange (1, 5);
+        cases.push_back (t);
+        switch (t) {
+            case 1:
+                {
+                    cases.push_back (randRange(1, count));
+                    cases.push_back (rand());
+                    break;
+                }
+            case 2:
+                {
+                    int start = randRange(1, count);
+                    int end = randRange(1, count);
+                    if (start > end) {
+                        swap (start, end);
+                    }
+                    cases.push_back (start);
+                    cases.push_back (end);
+                    cases.push_back (rand());
+                    break;
+                }
+            case 3:
+            case 4:
+                {
+                    cases.push_back (randRange(1, count));
+                    break;
+                }
+            case 5:
+                {
+                    int start = randRange(1, count);
+                    int end = randRange(1, count);
+                    if (start > end) {
+                        swap (start, end);
+                    }
+                    cases.push_back (start);
+                    cases.push_back (end);
+                }
         }
     }
+
     cout << "Testing correctness ...";
     clock_t c1 = clock ();
+    size_t casePos = 0;
     for (size_t i = 0; i < times; i++) {
-        if (!randTest (tests, numTests)) {
+        if (!randTest (cases, casePos, tests, numTests, count)) {
             cout << "failed" << endl;
-            return 0;
+            return 1;
         }
     }
     clock_t c2 = clock ();
@@ -301,8 +249,9 @@ int main () {
     for (size_t i = 0; i < numTests; i++) {
         cout << "  " << testNames[i] << " ...";
         clock_t c1 = clock ();
+        size_t casePos = 0;
         for (size_t j = 0; j < times; j++) {
-            randTest (tests+i, 1);
+            randTest (cases, casePos, tests+i, 1, count);
         }
         clock_t c2 = clock ();
         cout << c2 - c1 << "ms" << endl;
