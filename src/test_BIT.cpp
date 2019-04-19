@@ -330,19 +330,6 @@ inline bool randTest2D (const vector<int> &cases, size_t &caseStart, Test2D *tes
         }
     case 3:
         {
-            size_t rows = cases[caseStart++];
-            size_t cols = cases[caseStart++];
-            int k = tests[0]->sum (rows, cols);
-            DEBUG_LOG ("\tsum (%ul, %ul)\n", rows, cols);
-            for (size_t i = 1; i < numTests; i++) {
-                if (k != tests[i]->sum (rows, cols)) {
-                    return false;
-                }
-            }
-            break;
-        }
-    case 4:
-        {
             size_t posRow = cases[caseStart++];
             size_t posCol = cases[caseStart++];
             DEBUG_LOG ("\tsingleQuery (%ul, %ul)\n", posRow, posCol);
@@ -354,7 +341,7 @@ inline bool randTest2D (const vector<int> &cases, size_t &caseStart, Test2D *tes
             }
             break;
         }
-    case 5:
+    case 4:
         {
             size_t posRowStart = cases[caseStart++];
             size_t posColStart = cases[caseStart++];
@@ -373,18 +360,6 @@ inline bool randTest2D (const vector<int> &cases, size_t &caseStart, Test2D *tes
     return true;
 }
 
-
-#define TEST_BIT2D
-#ifdef TEST_BIT2D
-void printBIT2D(const BaseBIT2D<int> &bit) {
-    for (size_t i = 1; i < bit.countRows(); i++) {
-        for (size_t j = 1; j < bit.countCols(); j++) {
-            cout << bit.singleQuery(i, j) << " ";
-        }
-        cout << endl;
-    }
-}
-#endif
 
 void test1D (size_t count, size_t times) {
     Timing timing;
@@ -488,7 +463,7 @@ void test2D (size_t rows, size_t cols, size_t times) {
     cout << "2D Testing " << rows << "x" << cols << " numbers for " << times << " times" << endl;
     vector<int> cases;
     for (size_t i = 0; i < times; i++) {
-        int t = randRange (1, 4);
+        int t = randRange (1, 3);
         cases.push_back (t);
         switch (t) {
             case 1:
@@ -518,13 +493,12 @@ void test2D (size_t rows, size_t cols, size_t times) {
                     break;
                 }
             case 3:
-            case 4:
                 {
                     cases.push_back (randRange(1, rows));
                     cases.push_back (randRange(1, cols));
                     break;
                 }
-            case 5:
+            case 4:
                 {
                     int rowStart = randRange(1, rows);
                     int colStart = randRange(1, cols);
@@ -544,7 +518,7 @@ void test2D (size_t rows, size_t cols, size_t times) {
                 }
         }
     }
-/*
+
     cout << "Testing correctness ..." << flush;
     timing.begin ();
     size_t casePos = 0;
@@ -555,9 +529,9 @@ void test2D (size_t rows, size_t cols, size_t times) {
         }
     }
     cout << "Ok: " << timing.end()*1000 << "ms" << endl;
-*/
+
     cout << "Testing performance ..." << endl;
-    for (size_t i = 1; i < numTests; i++) {
+    for (size_t i = 0; i < numTests; i++) {
         cout << "  " << testNames[i] << " ..." << flush;
         timing.begin ();
         size_t casePos = 0;
