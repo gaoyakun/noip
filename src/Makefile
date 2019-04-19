@@ -1,5 +1,12 @@
+CONFIG?=release
 CXX?=g++
-CXXFLAGS:=-Wall -MMD $(CXXFLAGS)
+CXXFLAGS += -Wall -MMD
+ifeq ($(CONFIG),release)
+  CXXFLAGS += -O3
+else
+  CXXFLAGS += -g
+endif
+
 SRC = $(wildcard *.cpp)
 OBJ = $(SRC:%.cpp=%.o)
 TARGETS = $(SRC:%.cpp=%)

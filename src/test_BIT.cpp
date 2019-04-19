@@ -1,20 +1,58 @@
 #include <iostream>
 #include <vector>
+#include <string>
 #include <algorithm>
+#include <cstdio>
 #include <cstdlib>
 #include <ctime>
+#include <cstdarg>
 #include "SegmentTree.h"
 #include "BinaryIndexedTree.h"
 
 using std::cin;
 using std::cout;
+using std::flush;
 using std::endl;
+using std::string;
 using std::vector;
 using std::swap;
+
+//#define VERBOSE
+//#define TEST_1D
+#define TEST_2D
+
+#ifdef VERBOSE
+#define DEBUG_LOG(format, ...) do { cout << strFormat(format, ##__VA_ARGS__) << flush; } while(0)
+#else
+#define DEBUG_LOG(format, ...)
+#endif
+
+struct Timing {
+    clock_t ts;
+    void begin () {
+        ts = clock ();
+    }
+    float end () {
+        return float(clock () - ts)/CLOCKS_PER_SEC;
+    }
+};
+
+inline string strFormat (const char *format, ...) {
+    char buffer[256];
+    va_list args;
+    va_start (args, format);
+    vsnprintf (buffer, 256, format, args);
+    va_end (args);
+    return buffer;
+}
 
 inline int randRange (int start, int end) {
     return start + rand() % (end - start + 1);
 }
+
+//////////////////////////////////////////////////////////////////////////
+// start 1d array test
+//////////////////////////////////////////////////////////////////////////
 
 class Test {
 public:
@@ -111,7 +149,99 @@ public:
     }
 };
 
-inline bool randTest (const vector<int> &cases, size_t &caseStart, Test *tests[], size_t numTests, size_t count) {
+//////////////////////////////////////////////////////////////////////////
+// start 2d array test
+//////////////////////////////////////////////////////////////////////////
+
+class Test2D {
+public:
+    virtual void init (size_t rows, size_t cols) = 0;
+    virtual size_t countRows () const = 0;
+    virtual size_t countCols () const = 0;
+    virtual void singleAdd (size_t posRow, size_t posCol, int d) = 0;
+    virtual void rangeAdd (size_t posRowStart, size_t posColStart, size_t posRowEnd, size_t posColEnd, int d) = 0;
+    virtual int sum (size_t rows, size_t cols) const = 0;
+    virtual int singleQuery (size_t posRow, size_t posCol) const = 0;
+    virtual int rangeQuery (size_t posRowStart, size_t posColStart, size_t posRowEnd, size_t posColEnd) const = 0;
+};
+
+class BruteForceTest2D: public Test2D {
+    vector<vector<int> > A;
+public:
+    BruteForceTest2D (size_t rows=0, size_t cols=0) {
+        init (rows, cols);
+    }
+    virtual void init (size_t rows, size_t cols) {
+        A.resize (rows);
+        for (size_t i = 0; i < A.size(); i++) {
+            A[i].resize (cols, 0);
+        }
+    }
+    virtual size_t countRows () const {
+        return A.size();
+    }
+    virtual size_t countCols () const {
+        return A[0].size();
+    }
+    virtual void singleAdd (size_t posRow, size_t posCol, int d) {
+        A[posRow-1][posCol-1] += d;
+    }
+    virtual void rangeAdd (size_t posRowStart, size_t posColStart, size_t posRowEnd, size_t posColEnd, int d) {
+        for (size_t i = posRowStart-1; i < posRowEnd; i++) {
+            for (size_t j = posColStart-1; j < posColEnd; j++) {
+                A[i][j] += d;
+            }
+        }
+    }
+    virtual int sum (size_t rows, size_t cols) const {
+        return rangeQuery (1, 1, rows, cols);
+    }
+    virtual int singleQuery (size_t posRow, size_t posCol) const {
+        return A[posRow-1][posCol-1];
+    }
+    virtual int rangeQuery (size_t posRowStart, size_t posColStart, size_t posRowEnd, size_t posColEnd) const {
+        int result = 0;
+        for (size_t i = posRowStart-1; i < posRowEnd; i++) {
+            for (size_t j = posColStart-1; j < posColEnd; j++) {
+                result += A[i][j];
+            }
+        }
+        return result;
+    }
+};
+
+class BITTest2D: public Test2D {
+    BaseBIT2D<int> bit;
+public:
+    BITTest2D (size_t rows=0, size_t cols=0): bit(rows, cols) {
+    }
+    virtual void init (size_t rows, size_t cols) {
+        bit.init (rows, cols);
+    }
+    virtual size_t countRows () const {
+        return bit.countRows();
+    }
+    virtual size_t countCols () const {
+        return bit.countCols();
+    }
+    virtual void singleAdd (size_t posRow, size_t posCol, int d) {
+        bit.singleAdd (posRow, posCol, d);
+    }
+    virtual void rangeAdd (size_t posRowStart, size_t posColStart, size_t posRowEnd, size_t posColEnd, int d) {
+        bit.rangeAdd (posRowStart, posColStart, posRowEnd, posColEnd, d);
+    }
+    virtual int sum (size_t rows, size_t cols) const {
+        return bit.rangeQuery (1, 1, rows, cols);
+    }
+    virtual int singleQuery (size_t posRow, size_t posCol) const {
+        return bit.singleQuery (posRow, posCol);
+    }
+    virtual int rangeQuery (size_t posRowStart, size_t posColStart, size_t posRowEnd, size_t posColEnd) const {
+        return bit.rangeQuery (posRowStart, posColStart, posRowEnd, posColEnd);
+    }
+};
+
+inline bool randTest (const vector<int> &cases, size_t &caseStart, Test *tests[], size_t numTests) {
     int t = cases[caseStart++];
     switch (t) {
     case 1:
@@ -171,10 +301,93 @@ inline bool randTest (const vector<int> &cases, size_t &caseStart, Test *tests[]
     return true;
 }
 
-int main () {
-    const size_t count = 1000000;
-    const size_t times = 1000000;
-    srand (clock ());
+inline bool randTest2D (const vector<int> &cases, size_t &caseStart, Test2D *tests[], size_t numTests) {
+    int t = cases[caseStart++];
+    switch (t) {
+    case 1:
+        {
+            size_t posRow = cases[caseStart++];
+            size_t posCol = cases[caseStart++];
+            int d = cases[caseStart++];
+            DEBUG_LOG ("\tsingleAdd (%ul, %ul, %d)\n", posRow, posCol, d);
+            for (size_t i = 0; i < numTests; i++) {
+                tests[i]->singleAdd (posRow, posCol, d);
+            }
+            break;
+        }
+    case 2:
+        {
+            size_t posRowStart = cases[caseStart++];
+            size_t posColStart = cases[caseStart++];
+            size_t posRowEnd = cases[caseStart++];
+            size_t posColEnd = cases[caseStart++];
+            int d = cases[caseStart++];
+            DEBUG_LOG ("\trangeAdd (%ul, %ul, %ul, %ul, %d)\n", posRowStart, posColStart, posRowEnd, posColEnd, d);
+            for (size_t i = 0; i < numTests; i++) {
+                tests[i]->rangeAdd (posRowStart, posColStart, posRowEnd, posColEnd, d);
+            }
+            break;
+        }
+    case 3:
+        {
+            size_t rows = cases[caseStart++];
+            size_t cols = cases[caseStart++];
+            int k = tests[0]->sum (rows, cols);
+            DEBUG_LOG ("\tsum (%ul, %ul)\n", rows, cols);
+            for (size_t i = 1; i < numTests; i++) {
+                if (k != tests[i]->sum (rows, cols)) {
+                    return false;
+                }
+            }
+            break;
+        }
+    case 4:
+        {
+            size_t posRow = cases[caseStart++];
+            size_t posCol = cases[caseStart++];
+            DEBUG_LOG ("\tsingleQuery (%ul, %ul)\n", posRow, posCol);
+            int k = tests[0]->singleQuery (posRow, posCol);
+            for (size_t i = 1; i < numTests; i++) {
+                if (k != tests[i]->singleQuery (posRow, posCol)) {
+                    return false;
+                }
+            }
+            break;
+        }
+    case 5:
+        {
+            size_t posRowStart = cases[caseStart++];
+            size_t posColStart = cases[caseStart++];
+            size_t posRowEnd = cases[caseStart++];
+            size_t posColEnd = cases[caseStart++];
+            DEBUG_LOG ("\trangeQuery (%ul, %ul, %ul, %ul)\n", posRowStart, posColStart, posRowEnd, posColEnd);
+            int k = tests[0]->rangeQuery (posRowStart, posColStart, posRowEnd, posColEnd);
+            for (size_t i = 1; i < numTests; i++) {
+                if (k != tests[i]->rangeQuery (posRowStart, posColStart, posRowEnd, posColEnd)) {
+                    return false;
+                }
+            }
+            break;
+        }
+    }
+    return true;
+}
+
+
+#define TEST_BIT2D
+#ifdef TEST_BIT2D
+void printBIT2D(const BaseBIT2D<int> &bit) {
+    for (size_t i = 1; i < bit.countRows(); i++) {
+        for (size_t j = 1; j < bit.countCols(); j++) {
+            cout << bit.singleQuery(i, j) << " ";
+        }
+        cout << endl;
+    }
+}
+#endif
+
+void test1D (size_t count, size_t times) {
+    Timing timing;
     Test *tests[] = {
         new BruteForceTest,
         new BITTest,
@@ -190,7 +403,7 @@ int main () {
         tests[i]->init (count);
     }
 
-    cout << "Testing " << count << " numbers for " << times << " times" << endl;
+    cout << "1D Testing " << count << " numbers for " << times << " times" << endl;
     vector<int> cases;
     for (size_t i = 0; i < times; i++) {
         int t = randRange (1, 5);
@@ -229,33 +442,148 @@ int main () {
                     }
                     cases.push_back (start);
                     cases.push_back (end);
+                    break;
                 }
         }
     }
 
-    cout << "Testing correctness ...";
-    clock_t c1 = clock ();
+    cout << "Testing correctness ..." << flush;
+    timing.begin();
     size_t casePos = 0;
     for (size_t i = 0; i < times; i++) {
-        if (!randTest (cases, casePos, tests, numTests, count)) {
+        if (!randTest (cases, casePos, tests, numTests)) {
             cout << "failed" << endl;
-            return 1;
+            return;
         }
     }
-    clock_t c2 = clock ();
-    cout << "Ok: " << c2 - c1 << "ms" << endl;
+    cout << "Ok: " << timing.end()*1000 << "ms" << endl;
 
     cout << "Testing performance ..." << endl;
     for (size_t i = 0; i < numTests; i++) {
-        cout << "  " << testNames[i] << " ...";
-        clock_t c1 = clock ();
+        cout << "  " << testNames[i] << " ..." << flush;
+        timing.begin();
         size_t casePos = 0;
         for (size_t j = 0; j < times; j++) {
-            randTest (cases, casePos, tests+i, 1, count);
+            randTest (cases, casePos, tests+i, 1);
         }
-        clock_t c2 = clock ();
-        cout << c2 - c1 << "ms" << endl;
+        cout << timing.end()*1000 << "ms" << endl;
     }
+}
+
+void test2D (size_t rows, size_t cols, size_t times) {
+    Timing timing;
+    Test2D *tests[] = {
+        new BruteForceTest2D,
+        new BITTest2D
+    };
+    const char *testNames[] = {
+        "BruteForce",
+        "BIT"
+    };
+    const size_t numTests = sizeof(tests)/sizeof(tests[0]);
+    for (size_t i = 0; i < numTests; i++) {
+        tests[i]->init (rows, cols);
+    }
+
+    cout << "2D Testing " << rows << "x" << cols << " numbers for " << times << " times" << endl;
+    vector<int> cases;
+    for (size_t i = 0; i < times; i++) {
+        int t = randRange (1, 4);
+        cases.push_back (t);
+        switch (t) {
+            case 1:
+                {
+                    cases.push_back (randRange(1, rows));
+                    cases.push_back (randRange(1, cols));
+                    cases.push_back (rand());
+                    break;
+                }
+            case 2:
+                {
+                    int rowStart = randRange(1, rows);
+                    int colStart = randRange(1, cols);
+                    int rowEnd = randRange(1, rows);
+                    int colEnd = randRange(1, cols);
+                    if (rowStart > rowEnd) {
+                        swap (rowStart, rowEnd);
+                    }
+                    if (colStart > colEnd) {
+                        swap (colStart, colEnd);
+                    }
+                    cases.push_back (rowStart);
+                    cases.push_back (colStart);
+                    cases.push_back (rowEnd);
+                    cases.push_back (colEnd);
+                    cases.push_back (rand());
+                    break;
+                }
+            case 3:
+            case 4:
+                {
+                    cases.push_back (randRange(1, rows));
+                    cases.push_back (randRange(1, cols));
+                    break;
+                }
+            case 5:
+                {
+                    int rowStart = randRange(1, rows);
+                    int colStart = randRange(1, cols);
+                    int rowEnd = randRange(1, rows);
+                    int colEnd = randRange(1, cols);
+                    if (rowStart > rowEnd) {
+                        swap (rowStart, rowEnd);
+                    }
+                    if (colStart > colEnd) {
+                        swap (colStart, colEnd);
+                    }
+                    cases.push_back (rowStart);
+                    cases.push_back (colStart);
+                    cases.push_back (rowEnd);
+                    cases.push_back (colEnd);
+                    break;
+                }
+        }
+    }
+/*
+    cout << "Testing correctness ..." << flush;
+    timing.begin ();
+    size_t casePos = 0;
+    for (size_t i = 0; i < times; i++) {
+        if (!randTest2D (cases, casePos, tests, numTests)) {
+            cout << "failed" << endl;
+            return;
+        }
+    }
+    cout << "Ok: " << timing.end()*1000 << "ms" << endl;
+*/
+    cout << "Testing performance ..." << endl;
+    for (size_t i = 1; i < numTests; i++) {
+        cout << "  " << testNames[i] << " ..." << flush;
+        timing.begin ();
+        size_t casePos = 0;
+        for (size_t j = 0; j < times; j++) {
+            randTest2D (cases, casePos, tests+i, 1);
+        }
+        cout << timing.end()*1000 << "ms" << endl;
+    }
+}
+
+int main () {
+    const size_t times = 1000;
+    const clock_t seed = clock() % 1000;
+    cout << "Random seed: " << seed << endl;
+    srand (seed);
+
+#ifdef TEST_1D
+    const size_t count = 1000000;
+    test1D (count, times);
+#endif
+
+#ifdef TEST_2D
+    const size_t rows = 10000;
+    const size_t cols = 10000;
+    test2D (rows, cols, times);
+#endif
 
     return 0;
 }
