@@ -6,8 +6,8 @@
 #include <cstdlib>
 #include <ctime>
 #include <cstdarg>
-#include "SegmentTree.h"
-#include "BinaryIndexedTree.h"
+#include "segment_tree.h"
+#include "binary_indexed_tree.h"
 
 using std::cin;
 using std::cout;
@@ -18,7 +18,7 @@ using std::vector;
 using std::swap;
 
 //#define VERBOSE
-//#define TEST_1D
+#define TEST_1D
 #define TEST_2D
 
 #ifdef VERBOSE
@@ -211,7 +211,7 @@ public:
 };
 
 class BITTest2D: public Test2D {
-    BaseBIT2D<int> bit;
+    BIT2D<int> bit;
 public:
     BITTest2D (size_t rows=0, size_t cols=0): bit(rows, cols) {
     }
@@ -470,7 +470,7 @@ void test2D (size_t rows, size_t cols, size_t times) {
                 {
                     cases.push_back (randRange(1, rows));
                     cases.push_back (randRange(1, cols));
-                    cases.push_back (rand());
+                    cases.push_back (rand() % 1000);
                     break;
                 }
             case 2:
@@ -489,7 +489,7 @@ void test2D (size_t rows, size_t cols, size_t times) {
                     cases.push_back (colStart);
                     cases.push_back (rowEnd);
                     cases.push_back (colEnd);
-                    cases.push_back (rand());
+                    cases.push_back (rand() % 1000);
                     break;
                 }
             case 3:
@@ -542,20 +542,24 @@ void test2D (size_t rows, size_t cols, size_t times) {
     }
 }
 
-int main () {
-    const size_t times = 1000;
+int main (int argc, char *argv[]) {
+    if (argc != 5) {
+        cout << "Usage: test_bit_segtree 1D_ARRAY_SIZE 2D_ARRAY_ROWS 2D_ARRAY_COLS TEST_COUNT" << endl;
+        return 1;
+    }
+    const size_t times = atoi(argv[4]);
     const clock_t seed = clock() % 1000;
     cout << "Random seed: " << seed << endl;
     srand (seed);
 
 #ifdef TEST_1D
-    const size_t count = 1000000;
+    const size_t count = atoi(argv[1]);
     test1D (count, times);
 #endif
 
 #ifdef TEST_2D
-    const size_t rows = 10000;
-    const size_t cols = 10000;
+    const size_t rows = atoi(argv[2]);
+    const size_t cols = atoi(argv[3]);
     test2D (rows, cols, times);
 #endif
 
