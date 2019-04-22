@@ -5,73 +5,42 @@
 using std::vector;
 
 template <class T>
-class BaseBIT {
-    vector<T> C;
-public:
-    BaseBIT (size_t size = 0) {
-        init (size);
-    }
-    void init (size_t size) {
-        C.resize (size + 1, 0);
-    }
-    size_t count () const {
-        return C.size() - 1;
-    }
-    void singleAdd (size_t pos, T d) {
-        size_t count = C.size();
-        while (pos <= count) {
-            C[pos] += d;
-            pos += pos & -pos;
-        }
-    }
-    void rangeAdd (size_t posStart, size_t posEnd, T d) {
-        for (size_t i = posStart; i <= posEnd; i++) {
-            singleAdd (i, d);
-        }
-    }
-    T sum (size_t n) const {
-        T result = 0;
-        while (n) {
-            result += C[n];
-            n -= n & -n;
-        }
-        return result;
-    }
-    T singleQuery (size_t pos) const {
-        return sum(pos) - sum(pos-1);
-    }
-    T rangeQuery (size_t posStart, size_t posEnd) const {
-        return sum(posEnd) - sum(posStart-1);
-    }
-};
-
-template <class T>
 class BIT {
-    BaseBIT<T> baseBIT1;
-    BaseBIT<T> baseBIT2;
+    vector<T> t1;
+    vector<T> t2;
 public:
-    BIT (size_t size = 0)
-    : baseBIT1(size)
-    , baseBIT2(size) {
+    BIT (size_t size = 0) {
+        init (size);
     } 
     void init (size_t size) {
-        baseBIT1.init(size);
-        baseBIT2.init(size);
+        t1.resize (size + 1, 0);
+        t2.resize (size + 1, 0);
     }
     size_t count () const {
-        return baseBIT1.count();
+        return t1.size() - 1;
     }
     void singleAdd (size_t pos, T d) {
         rangeAdd (pos, pos, d);
     }
     void rangeAdd (size_t posStart, size_t posEnd, T d) {
-        baseBIT1.singleAdd (posStart, d);
-        baseBIT1.singleAdd (posEnd+1, -d);
-        baseBIT2.singleAdd (posStart, d * posStart);
-        baseBIT2.singleAdd (posEnd+1, -d * (posEnd+1));
+        size_t n = count();
+        for (size_t i = posStart; i <= n; i += i & -i) {
+            t1[i] += d;
+            t2[i] += posStart * d;
+        }
+        for (size_t i = posEnd+1; i <= n; i += i & -i) {
+            t1[i] -= d;
+            t2[i] -= (posEnd + 1) * d;
+        }
     }
     T sum (size_t n) const {
-        return (n + 1) * baseBIT1.sum(n) - baseBIT2.sum(n);
+        T r1 = 0;
+        T r2 = 0;
+        for (size_t i = n; i > 0; i -= i & -i) {
+            r1 += t1[i];
+            r2 += t2[i];
+        }
+        return (n + 1) * r1 - r2;
     }
     T singleQuery (size_t pos) const {
         return rangeQuery (pos, pos);

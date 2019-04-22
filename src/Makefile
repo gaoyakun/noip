@@ -11,7 +11,6 @@ SRC = $(wildcard *.cpp)
 OBJ = $(SRC:%.cpp=%.o)
 TARGETS = $(SRC:%.cpp=%)
 DEP = $(SRC:%.cpp=%.d)
-DSYM = $(SRC:%.cpp=%.dSYM)
 
 all: $(TARGETS)
 
