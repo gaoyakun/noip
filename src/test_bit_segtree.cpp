@@ -2,12 +2,11 @@
 #include <vector>
 #include <string>
 #include <algorithm>
-#include <cstdio>
-#include <cstdlib>
-#include <ctime>
-#include <cstdarg>
 #include "segment_tree.h"
 #include "binary_indexed_tree.h"
+
+//#define VERBOSE
+#include "test_common.h"
 
 using std::cin;
 using std::cout;
@@ -17,38 +16,8 @@ using std::string;
 using std::vector;
 using std::swap;
 
-//#define VERBOSE
 #define TEST_1D
 #define TEST_2D
-
-#ifdef VERBOSE
-#define DEBUG_LOG(format, ...) do { cout << strFormat(format, ##__VA_ARGS__) << flush; } while(0)
-#else
-#define DEBUG_LOG(format, ...)
-#endif
-
-struct Timing {
-    clock_t ts;
-    void begin () {
-        ts = clock ();
-    }
-    float end () {
-        return float(clock () - ts)/CLOCKS_PER_SEC;
-    }
-};
-
-inline string strFormat (const char *format, ...) {
-    char buffer[256];
-    va_list args;
-    va_start (args, format);
-    vsnprintf (buffer, 256, format, args);
-    va_end (args);
-    return buffer;
-}
-
-inline int randRange (int start, int end) {
-    return start + rand() % (end - start + 1);
-}
 
 //////////////////////////////////////////////////////////////////////////
 // start 1d array test
@@ -387,7 +356,7 @@ void test1D (size_t count, size_t times) {
             case 1:
                 {
                     cases.push_back (randRange(1, count));
-                    cases.push_back (rand());
+                    cases.push_back (randRange(-10000, 10000));
                     break;
                 }
             case 2:
@@ -399,7 +368,7 @@ void test1D (size_t count, size_t times) {
                     }
                     cases.push_back (start);
                     cases.push_back (end);
-                    cases.push_back (rand());
+                    cases.push_back (randRange(-10000, 10000));
                     break;
                 }
             case 3:
@@ -423,7 +392,6 @@ void test1D (size_t count, size_t times) {
     }
 
     cout << "Testing correctness ..." << flush;
-    timing.begin();
     size_t casePos = 0;
     for (size_t i = 0; i < times; i++) {
         if (!randTest (cases, casePos, tests, numTests)) {
@@ -431,9 +399,9 @@ void test1D (size_t count, size_t times) {
             return;
         }
     }
-    cout << "Ok: " << timing.end()*1000 << "ms" << endl;
 
     cout << "Testing performance ..." << endl;
+    double base = 0;
     for (size_t i = 0; i < numTests; i++) {
         cout << "  " << testNames[i] << " ..." << flush;
         timing.begin();
@@ -441,7 +409,12 @@ void test1D (size_t count, size_t times) {
         for (size_t j = 0; j < times; j++) {
             randTest (cases, casePos, tests+i, 1);
         }
-        cout << timing.end()*1000 << "ms" << endl;
+        if (i == 0) {
+            base = timing.end();
+            cout << "100%" << endl;
+        } else {
+            cout << int((timing.end() / base) * 1000)/10.f << "%" << endl;
+        }
     }
 }
 
@@ -470,7 +443,7 @@ void test2D (size_t rows, size_t cols, size_t times) {
                 {
                     cases.push_back (randRange(1, rows));
                     cases.push_back (randRange(1, cols));
-                    cases.push_back (rand() % 1000);
+                    cases.push_back (randRange(-10000, 10000));
                     break;
                 }
             case 2:
@@ -489,7 +462,7 @@ void test2D (size_t rows, size_t cols, size_t times) {
                     cases.push_back (colStart);
                     cases.push_back (rowEnd);
                     cases.push_back (colEnd);
-                    cases.push_back (rand() % 1000);
+                    cases.push_back (randRange(-10000, 10000));
                     break;
                 }
             case 3:
@@ -520,7 +493,6 @@ void test2D (size_t rows, size_t cols, size_t times) {
     }
 
     cout << "Testing correctness ..." << flush;
-    timing.begin ();
     size_t casePos = 0;
     for (size_t i = 0; i < times; i++) {
         if (!randTest2D (cases, casePos, tests, numTests)) {
@@ -528,9 +500,9 @@ void test2D (size_t rows, size_t cols, size_t times) {
             return;
         }
     }
-    cout << "Ok: " << timing.end()*1000 << "ms" << endl;
 
     cout << "Testing performance ..." << endl;
+    double base = 0;
     for (size_t i = 0; i < numTests; i++) {
         cout << "  " << testNames[i] << " ..." << flush;
         timing.begin ();
@@ -538,7 +510,12 @@ void test2D (size_t rows, size_t cols, size_t times) {
         for (size_t j = 0; j < times; j++) {
             randTest2D (cases, casePos, tests+i, 1);
         }
-        cout << timing.end()*1000 << "ms" << endl;
+        if (i == 0) {
+            base = timing.end();
+            cout << "100%" << endl;
+        } else {
+            cout << int((timing.end() / base) * 1000)/10.f << "%" << endl;
+        }
     }
 }
 
@@ -550,7 +527,7 @@ int main (int argc, char *argv[]) {
     const size_t times = atoi(argv[4]);
     const clock_t seed = clock() % 1000;
     cout << "Random seed: " << seed << endl;
-    srand (seed);
+    randomSeed (seed);
 
 #ifdef TEST_1D
     const size_t count = atoi(argv[1]);
