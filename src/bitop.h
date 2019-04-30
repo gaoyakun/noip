@@ -8,7 +8,7 @@ static inline bool haveOppsiteSigns (int x, int y) {
 
 // Determin if an integer is a power of 2
 static inline bool isPowerOf2 (unsigned x) {
-    return x && (x & (x - 1) == 0);
+    return x && (x & (x - 1)) == 0;
 }
 
 // Counting bits set

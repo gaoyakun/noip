@@ -6,19 +6,19 @@
 #include <cstdio>
 #include <ctime>
 #include <cstdarg>
-#include <cstdint>
+#include <climits>
 #include "random.h"
 
 #if defined(WIN32) || defined(_WIN32)
 #include <intrin.h>
-inline uint64_t rdtsc() {
+inline unsigned long long rdtsc() {
 	return __rdtsc();
 }
 #else
-inline uint64_t rdtsc() {
+inline unsigned long long rdtsc() {
 	unsigned lo, hi;
 	__asm__ __volatile__("rdtsc" : "=a" (lo), "=d" (hi));
-	return ((uint64_t)hi << 32) | lo;
+	return ((unsigned long long)hi << 32) | lo;
 }
 #endif
 
@@ -29,11 +29,11 @@ inline uint64_t rdtsc() {
 #endif
 
 struct Timing {
-    uint64_t ts;
+    unsigned long long ts;
     void begin () {
         ts = rdtsc ();
     }
-    uint64_t end () {
+    unsigned long long end () {
 		return rdtsc() - ts;
     }
 };
@@ -55,5 +55,14 @@ inline void randSeed (int seed) {
 inline int randRange (int start, int end) {
     return randomInt (start, end);
 }
+
+struct RandIntGen {
+    int operator () () const {
+        return randomInt (INT_MIN, INT_MAX);
+    }
+    int operator () (int lower, int upper) const {
+        return randomInt (lower, upper);
+    }
+};
 
 #endif // __TEST_COMMON__

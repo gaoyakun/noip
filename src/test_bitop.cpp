@@ -56,7 +56,7 @@ bool hasZeroByte_bruteForce (unsigned x) {
     return !((x & 0xff) && (x & 0xff00) && (x & 0xff0000) && (x & 0xff000000));
 }
 
-bool hasByte_bruteForce (unsigned x, unsigned char n) {
+bool hasByte_bruteForce (unsigned x, unsigned n) {
     return (x & 0xff) == n || (x & 0xff00) == (n << 8) || (x & 0xff0000) == (n << 16) || (x & 0xff000000) == (n << 24);
 }
 
@@ -127,10 +127,10 @@ int main (int argc, char *argv[]) {
     cout << "Random seed: " << seed << endl;
     randomSeed (seed);
 
-    for (int i = 0; i < sizeof(testOptions)/sizeof(testOptions[0]); i++) {
+    for (size_t i = 0; i < sizeof(testOptions)/sizeof(testOptions[0]); i++) {
         cout << "Testing " << testNames[i] << "..." << flush;
         bool failed =false;
-        for (int j = 0; j < times; j++) {
+        for (size_t j = 0; j < times; j++) {
             if (!testOptions[i]()) {
                 failed = true;
                 break;

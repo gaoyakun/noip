@@ -399,6 +399,7 @@ void test1D (size_t count, size_t times) {
             return;
         }
     }
+    cout << "ok" << endl;
 
     cout << "Testing performance ..." << endl;
     double base = 0;
@@ -500,6 +501,7 @@ void test2D (size_t rows, size_t cols, size_t times) {
             return;
         }
     }
+    cout << "ok" << endl;
 
     cout << "Testing performance ..." << endl;
     double base = 0;
