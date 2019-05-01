@@ -1,3 +1,6 @@
+/**
+ * Bitwise operations
+ */
 #ifndef __BITOP__
 #define __BITOP__
 
