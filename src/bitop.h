@@ -1,6 +1,14 @@
 #ifndef __BITOP__
 #define __BITOP__
 
+#include <climits>
+
+// Calculate the absolute value of an integer
+static inline int absoluteValue (int x) {
+    int mask = x >> (sizeof(int) * CHAR_BIT - 1);
+    return (x + mask) ^ mask;
+}
+
 // Detect if two integers have opposite signs
 static inline bool haveOppsiteSigns (int x, int y) {
     return (x ^ y) < 0;
@@ -13,11 +21,20 @@ static inline bool isPowerOf2 (unsigned x) {
 
 // Counting bits set
 static inline unsigned bitsSet (unsigned x) {
+#if 0
     unsigned c = 0;
     for (; x; c++) {
         x &= x - 1;
     }
     return c;
+#else
+    x = (x & 0x55555555) + ((x >> 1) & 0x55555555);
+    x = (x & 0x33333333) + ((x >> 2) & 0x33333333);
+    x = (x & 0x0f0f0f0f) + ((x >> 4) & 0x0f0f0f0f);
+    x = (x & 0x00ff00ff) + ((x >> 8) & 0x00ff00ff);
+    x = (x & 0x0000ffff) + ((x >> 16) & 0x0000ffff);
+    return x;
+#endif
 }
 
 // Reverse bits
