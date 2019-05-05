@@ -2,12 +2,11 @@
 #define __BINARYINDEXEDTREE__
 
 #include <vector>
-using std::vector;
 
 template <class T>
 class BIT {
-    vector<T> t1;
-    vector<T> t2;
+    std::vector<T> t1;
+    std::vector<T> t2;
 public:
     BIT (size_t size = 0) {
         init (size);
@@ -52,10 +51,10 @@ public:
 
 template <class T>
 class BIT2D {
-    vector<vector<T> > t1;
-    vector<vector<T> > t2;
-    vector<vector<T> > t3;
-    vector<vector<T> > t4;
+    std::vector<std::vector<T> > t1;
+    std::vector<std::vector<T> > t2;
+    std::vector<std::vector<T> > t3;
+    std::vector<std::vector<T> > t4;
 public:
     BIT2D (size_t rows = 0, size_t cols = 0) {
         init (rows, cols);

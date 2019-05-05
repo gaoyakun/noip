@@ -65,4 +65,5 @@ struct RandIntGen {
     }
 };
 
+
 #endif // __TEST_COMMON__
