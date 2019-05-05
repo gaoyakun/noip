@@ -10,6 +10,10 @@ using std::cout;
 using std::flush;
 using std::endl;
 
+int absoluteValue_bruteforce (int x) {
+    return x < 0 ? -x : x;
+}
+
 bool haveOppsiteSigns_bruteforce (int x, int y) {
     return (x >= 0 && y < 0) || (x < 0 && y >= 0);
 }
@@ -60,6 +64,11 @@ bool hasByte_bruteForce (unsigned x, unsigned n) {
     return (x & 0xff) == n || (x & 0xff00) == (n << 8) || (x & 0xff0000) == (n << 16) || (x & 0xff000000) == (n << 24);
 }
 
+bool testAbsoluteValue () {
+    int x = randRange (INT_MIN, INT_MAX);
+    return absoluteValue (x) == absoluteValue_bruteforce (x);
+}
+
 bool testHaveOppositeSigns () {
     int x = randRange (-50000, 50000);
     int y = randRange (-50000, 50000);
@@ -98,6 +107,7 @@ bool testHasByte () {
 }
 
 bool (*testOptions[])() = {
+    testAbsoluteValue,
     testHaveOppositeSigns,
     testIsPowerOf2,
     testBitsSet,
@@ -108,6 +118,7 @@ bool (*testOptions[])() = {
 };
 
 const char *testNames[] = {
+    "Absolute value",
     "Have opposite signs",
     "Is power of 2",
     "Bits set",
