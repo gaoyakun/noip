@@ -9,13 +9,13 @@ using std::endl;
 using std::vector;
 using std::sort;
 
-vector<Bundle> bundles;
-vector<Bundle> bundles2;
-size_t ans = 0;
-
 struct Bundle {
     int a[3];
 };
+
+vector<Bundle> bundles;
+vector<Bundle> bundles2;
+size_t ans = 0;
 
 struct CompGreater {
     size_t index;
