@@ -1,5 +1,5 @@
-#ifndef __RANDOM__
-#define __RANDOM__
+#ifndef __RANDOM_H__
+#define __RANDOM_H__
 
 namespace {
     static double u[97], c, cd, cm;
@@ -77,4 +77,4 @@ inline double randomDouble (double lower, double upper) {
     return (upper - lower) * _randomUniform() + lower;
 }
 
-#endif // __RANDOM__
+#endif // __RANDOM_H__

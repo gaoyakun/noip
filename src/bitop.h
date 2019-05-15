@@ -1,8 +1,8 @@
 /**
  * Bitwise operations
  */
-#ifndef __BITOP__
-#define __BITOP__
+#ifndef __BITOP_H__
+#define __BITOP_H__
 
 #include <climits>
 
@@ -71,4 +71,4 @@ static inline bool hasByte (unsigned x, unsigned char n) {
     return hasZeroByte (x ^ (~0u / 255 * n));
 }
 
-#endif // __BITOP__
+#endif // __BITOP_H__

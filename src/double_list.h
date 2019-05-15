@@ -1,5 +1,5 @@
-#ifndef __DOUBLE_LIST__
-#define __DOUBLE_LIST__
+#ifndef __DOUBLE_LIST_H__
+#define __DOUBLE_LIST_H__
 
 #include <iterator>
 #include <cstddef>
@@ -100,4 +100,4 @@ public:
     }
 };
 
-#endif // __DOUBLE_LIST__
+#endif // __DOUBLE_LIST_H__

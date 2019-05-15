@@ -1,5 +1,5 @@
-#ifndef __TEST_COMMON__
-#define __TEST_COMMON__
+#ifndef __TEST_COMMON_H__
+#define __TEST_COMMON_H__
 
 #include <iostream>
 #include <string>
@@ -66,4 +66,4 @@ struct RandIntGen {
 };
 
 
-#endif // __TEST_COMMON__
+#endif // __TEST_COMMON_H__

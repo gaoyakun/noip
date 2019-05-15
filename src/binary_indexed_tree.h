@@ -1,14 +1,14 @@
-#ifndef __BINARYINDEXEDTREE__
-#define __BINARYINDEXEDTREE__
+#ifndef __BINARY_INDEXED_TREE_H__
+#define __BINARY_INDEXED_TREE_H__
 
 #include <vector>
 
 template <class T>
-class BIT {
+class BinaryIndexedTree {
     std::vector<T> t1;
     std::vector<T> t2;
 public:
-    BIT (size_t size = 0) {
+    BinaryIndexedTree (size_t size = 0) {
         init (size);
     } 
     void init (size_t size) {
@@ -50,13 +50,13 @@ public:
 };
 
 template <class T>
-class BIT2D {
+class BinaryIndexedTree2D {
     std::vector<std::vector<T> > t1;
     std::vector<std::vector<T> > t2;
     std::vector<std::vector<T> > t3;
     std::vector<std::vector<T> > t4;
 public:
-    BIT2D (size_t rows = 0, size_t cols = 0) {
+    BinaryIndexedTree2D (size_t rows = 0, size_t cols = 0) {
         init (rows, cols);
     }
     void init (size_t rows, size_t cols) {
@@ -100,7 +100,6 @@ public:
     }
     T rangeQuery (size_t posRowStart, size_t posColStart, size_t posRowEnd, size_t posColEnd) const {
         return sum (posRowEnd, posColEnd) - sum (posRowStart-1, posColEnd) - sum (posRowEnd, posColStart-1) + sum (posRowStart-1, posColStart-1);
-        //return sum (posRowEnd, posColEnd) - sum (posRowEnd, posColStart) - sum (posRowStart, posColEnd) + sum (posRowStart, posColStart);
     }
 private:
     void _add (size_t posRow, size_t posCol, T d) {
@@ -117,4 +116,4 @@ private:
     }
 };
 
-#endif // __BINARYINDEXEDTREE__
+#endif // __BINARY_INDEXED_TREE_H__

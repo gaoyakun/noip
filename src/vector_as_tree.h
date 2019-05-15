@@ -1,24 +1,38 @@
 /** tree structure implementation by vector */
-#ifndef __VECTOR_AS_TREE__
-#define __VECTOR_AS_TREE__
+#ifndef __VECTOR_AS_TREE_H__
+#define __VECTOR_AS_TREE_H__
 
+#include <functional>
+#include <utility>
 #include <vector>
 
-template <class T>
+template <class K, class E>
+struct TreeNodeTypeGen {
+    typedef std::pair<K, E> node_type;
+};
+
+template <class K>
+struct TreeNodeTypeGen<K, void> {
+    typedef K node_type;
+};
+
+
+template <class T, class E=void>
 class VectorAsBinaryTree {
 public:
     enum {
         ROOT_NODE = 0,
         INVALID_NODE = -1
     };
-    typedef T value_type;
+    typedef typename TreeNodeTypeGen<T, E>::node_type value_type;
+
 protected:
     struct Node {
-        T value;
+        value_type value;
         int parent;
         int left;
         int right;
-        Node (const T &val, int root)
+        Node (const value_type &val, int root)
         : value(val)
         , parent(root)
         , left(INVALID_NODE)
@@ -30,14 +44,14 @@ protected:
 public:
     VectorAsBinaryTree () {
     }
-    VectorAsBinaryTree (const T &value) {
+    VectorAsBinaryTree (const value_type &value) {
         _tree.push_back (Node(value, INVALID_NODE));
     }
-    void setRoot (const T &value) {
+    void setRoot (const value_type &value) {
         clear ();
         _tree.push_back (Node(value, INVALID_NODE));
     }
-    int addLeft (int root, const T &value) {
+    int addLeft (int root, const value_type &value) {
         if (_tree[root].left != INVALID_NODE) {
             return INVALID_NODE;
         }
@@ -56,7 +70,7 @@ public:
         _tree[root].left = result;
         return result;
     }
-    int addRight (int root, const T &value) {
+    int addRight (int root, const value_type &value) {
         if (_tree[root].right != INVALID_NODE) {
             return INVALID_NODE;
         }
@@ -102,10 +116,10 @@ public:
     int getRight (int root) const {
         return _tree[root].right;
     }
-    const T &value (int node) const {
+    const value_type &value (int node) const {
         return _tree[node].value;
     }
-    T &value (int node) {
+    value_type &value (int node) {
         return _tree[node].value;
     }
     int size () const {
@@ -153,4 +167,4 @@ public:
     }
 };
 
-#endif // #define __VECTOR_AS_TREE__
+#endif // #define __VECTOR_AS_TREE_H__

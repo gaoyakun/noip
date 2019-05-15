@@ -67,7 +67,7 @@ public:
 };
 
 class BITTest: public Test {
-    BIT<int> bit;
+    BinaryIndexedTree<int> bit;
 public:
     virtual void init (size_t size) {
         bit.init(size);
@@ -180,7 +180,7 @@ public:
 };
 
 class BITTest2D: public Test2D {
-    BIT2D<int> bit;
+    BinaryIndexedTree2D<int> bit;
 public:
     BITTest2D (size_t rows=0, size_t cols=0): bit(rows, cols) {
     }

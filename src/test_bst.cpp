@@ -2,7 +2,7 @@
 #include <cstdlib>
 #include "test_common.h"
 #include "vector_as_tree.h"
-#include "bst.h"
+#include "binary_search_tree.h"
 
 using std::cin;
 using std::cout;
@@ -18,7 +18,7 @@ struct TraverseFunc {
         count_verify = 0;
         ok = true;
     }
-    void operator () (typename BST<int>::value_type &val) const {
+    void operator () (typename BinarySearchTree<int>::value_type &val) const {
         if (val.first <= lastValue) {
             ok = false;
         }
@@ -27,12 +27,12 @@ struct TraverseFunc {
 };
 
 bool testCase (size_t count) {
-    BST<int> bst;
+    BinarySearchTree<int> bst;
     for (size_t i = 0; i < count; i++) {
         bst.add (randRange (-10000, 10000));
     }
     TraverseFunc func;
-    bst.inorderIterate (BST<int>::ROOT_NODE, func);
+    bst.inorderIterate (BinarySearchTree<int>::ROOT_NODE, func);
     return func.ok && func.count_verify == count;
 }
 
@@ -47,7 +47,7 @@ int main (int argc, char *argv[]) {
     cout << "Random seed: " << seed << endl;
     randomSeed (seed);
 
-    cout << "Testing BST ..." << flush;
+    cout << "Testing binary search tree ..." << flush;
     bool failed = false;
     for (size_t j = 0; j < times; j++) {
         if (!testCase (count)) {
