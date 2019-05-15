@@ -1,4 +1,4 @@
-/** implementation of binary search tree */
+/** Implementation of Binary-Search-Tree */
 #ifndef __BST_H__
 #define __BST_H__
 
