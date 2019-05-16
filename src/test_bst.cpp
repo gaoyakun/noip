@@ -18,7 +18,7 @@ struct TraverseFunc {
         count_verify = 0;
         ok = true;
     }
-    void operator () (typename BinarySearchTree<int>::value_type &val) const {
+    void operator () (const BinarySearchTree<int>::value_type &val) const {
         if (val.value <= lastValue) {
             ok = false;
         }

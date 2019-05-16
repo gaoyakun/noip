@@ -69,7 +69,7 @@ private:
     int add_r (node_type *node, const T &val, node_type *&rotateNode) {
         const T &curVal = node->value.value;
         if (node->balanceFactor) {
-            rotateNode = bf;
+            rotateNode = node;
         }
         int d = 0;
         if (Comp()(curVal, val)) {
@@ -105,20 +105,38 @@ private:
         rotateLeft (node);
     }
     void rotateLeft (node_type *node) {
-
+        if (node->parent) {
+            if (node->parent->left == node) {
+                node->parent->left = node->right;
+            } else {
+                node->parent->right = node->right;
+            }
+            node->right->parent = node->parent;
+        }
+        node_type *tmp = node->right->left;
+        node->right->left = node;
+        node->parent = node->right;
+        node->right = tmp;
+        int dr = node->value.balanceFactor - (node->parent->value.balanceFactor >= 0 ? -1 : node->parent->value.balanaceFactor - 1); 
+        node->parent->value.balanceFactor = node->value.balanceFactor + 2;
+        node->value.balanceFactor = dr;
     }
     void rotateRight (node_type *node) {
-        int parent = this->getParent(node);
-        if (parent != INVALID_NODE) {
-            if (this->getLeft(parent) == node) {
-                this->setLeft (parent, this->getLeft(node));
+        if (node->parent) {
+            if (node->parent->left == node) {
+                node->parent->left = node->left;
             } else {
-                this->setRight (parent, this->getLeft(node));
+                node->parent->right = node->left;
             }
+            node->left->parent = node->parent;
         }
-        int right = this->getRight(this->getLeft(node));
-        this->setRight(this->getLeft(node), node);
-        this->setLeft(node, right);
+        node_type *tmp = node->left->right;
+        node->left->right = node;
+        node->parent = node->left;
+        node->left = tmp;
+        int dl = node->value.balanceFactor + (node->parent->value.balanceFactor <= 0 ? -1 : -node->parent->value.balanaceFactor - 1); 
+        node->parent->value.balanceFactor = node->value.balanceFactor - 2;
+        node->value.balanceFactor = dl;
     }
 };
 
