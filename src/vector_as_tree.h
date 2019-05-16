@@ -110,8 +110,14 @@ public:
     int getParent (int node) const {
         return _tree[node].parent;
     }
+    void setLeft (int root, int left) {
+        _tree[root].left = left;
+    }
     int getLeft (int root) const {
         return _tree[root].left;
+    }
+    void setRight (int root, int right) {
+        _tree[root].right = right;
     }
     int getRight (int root) const {
         return _tree[root].right;

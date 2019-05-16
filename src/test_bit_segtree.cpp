@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <string>
+#include <ctime>
 #include <algorithm>
 #include "segment_tree.h"
 #include "binary_indexed_tree.h"
@@ -527,7 +528,7 @@ int main (int argc, char *argv[]) {
         return 1;
     }
     const size_t times = atoi(argv[4]);
-    const clock_t seed = clock() % 1000;
+    const clock_t seed = time(NULL) % 1000;
     cout << "Random seed: " << seed << endl;
     randomSeed (seed);
 

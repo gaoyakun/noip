@@ -4,68 +4,121 @@
 
 #include <functional>
 #include <utility>
-#include "vector_as_tree.h"
+#include "binary_tree.h"
+
+template <class T>
+struct AVLNode {
+    T value;
+    int balanceFactor;
+    unsigned count;
+    AVLNode () 
+    : value()
+    , balanceFactor(0)
+    , count(1) {
+    }
+    explicit AVLNode (const T &val)
+    : value(val)
+    , balanceFactor(0)
+    , count(1) {
+    }
+    AVLNode (const T &val, unsigned c)
+    : value(val)
+    , balanceFactor(0)
+    , count(c) {
+    }
+};
+
 
 template <class T, class Comp=std::less<T> > 
-class AVLTree: public VectorAsBinaryTree<T, std::pair<int,int> > {
+class AVLTree: public BinaryTree<AVLNode<T> > {
 public:
-    typedef VectorAsBinaryTree<T, std::pair<int,int> > base_type;
+    typedef BinaryTree<AVLNode<T> > base_type;
     typedef typename base_type::value_type value_type;
+    typedef typename base_type::node_type node_type;
 public:
     void add (const T &val) {
-        if (this->size() == 0) {
-            this->setRoot (value_type(val, make_pair<int,int>(1,0)));
+        if (!this->getRoot()) {
+            this->setRoot (value_type(val));
         } else {
-            add_r (base_type::ROOT_NODE, val, this->value(base_type::ROOT_NODE).second.second != 0 ? base_type::ROOT_NODE : base_type::INVALID_NODE);
+            node_type *rotateNode = NULL;
+            add_r (this->getRoot(), val, rotateNode);
+            if (rotateNode) {
+                int bf = rotateNode->value.balanceFactor;
+                if (bf == 2) {
+                    maintainLeft(rotateNode);
+                } else {
+                    maintainRight(rotateNode);
+                }
+            }
         }
     }
     int find (const T &val) {
-        if (this->size() == 0) {
-            return 0;
-        }
-        return find_r (0, val);
+        return this->getRoot() ? find_r (this->getRoot(), val) : 0;
     }
 private:
-    int find_r (int node, const T &val) const {
-        const T &curVal = this->value(node).first;
+    int find_r (node_type *node, const T &val) const {
+        const T &curVal = node->value.value;
         if (Comp()(curVal, val)) {
-            int right = this->getRight(node);
-            if (right == base_type::INVALID_NODE) {
-                return 0;
-            } else {
-                return find_r (right, val);
-            }
+            return node->right ? find_r (node->right, val) : 0;
         } else if (Comp()(val, curVal)) {
-            int left = this->getLeft(node);
-            if (left == base_type::INVALID_NODE) {
-                return 0;
-            } else {
-                return find_r (left, val);
-            }
+            return node->left ? find_r (node->left, val) : 0;
         } else {
-            return this->value(node).second;
+            return node->value.count;
         }
     }
-    int add_r (int node, const T &val, int p) {
-        const T &curVal = this->value(node).first;
+    int add_r (node_type *node, const T &val, node_type *&rotateNode) {
+        const T &curVal = node->value.value;
+        if (node->balanceFactor) {
+            rotateNode = bf;
+        }
+        int d = 0;
         if (Comp()(curVal, val)) {
-            int right = this->getRight(node);
-            if (right == base_type::INVALID_NODE) {
-                this->addRight (node, value_type(val, 1));
-
+            if (node->right) {
+                d = -add_r (node->right, val, rotateNode);
             } else {
-                add_r (right, val, curVal.second.second != 0 ? node : p);
+                node->right = new node_type (value_type(val), node);
+                d = -1;
             }
         } else if (Comp()(val, curVal)) {
-            int left = this->getLeft(node);
-            if (left == base_type::INVALID_NODE) {
-                this->addLeft (node, value_type(val, 1));
+            if (node->left) {
+                d = add_r (node->left, val, rotateNode);
             } else {
-                add_r (left, val, curVal.second.second != 0 ? node : p);
+                node->left = new node_type (value_type(val), node);
+                d = 1;
             }
         } else {
-            this->value(node).second++;
+            node->value.count++;
         }
+        node->balanceFactor += d;
+        return node->balanceFactor && node != rotateNode ? 1 : 0;
+    }
+    void maintainLeft (node_type *node) {
+        if (node->left->value.balanceFactor < 0) {
+            rotateLeft (node->right);
+        }
+        rotateRight (node);
+    }
+    void maintainRight (node_type *node) {
+        if (node->right->value.balanceFactor > 0) {
+            rotateRight (node->left);
+        }
+        rotateLeft (node);
+    }
+    void rotateLeft (node_type *node) {
+
+    }
+    void rotateRight (node_type *node) {
+        int parent = this->getParent(node);
+        if (parent != INVALID_NODE) {
+            if (this->getLeft(parent) == node) {
+                this->setLeft (parent, this->getLeft(node));
+            } else {
+                this->setRight (parent, this->getLeft(node));
+            }
+        }
+        int right = this->getRight(this->getLeft(node));
+        this->setRight(this->getLeft(node), node);
+        this->setLeft(node, right);
     }
 };
 

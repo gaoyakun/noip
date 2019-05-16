@@ -1,7 +1,7 @@
 #include <iostream>
 #include <cstdlib>
 #include "test_common.h"
-#include "vector_as_tree.h"
+#include "binary_tree.h"
 #include "binary_search_tree.h"
 
 using std::cin;
@@ -19,10 +19,10 @@ struct TraverseFunc {
         ok = true;
     }
     void operator () (typename BinarySearchTree<int>::value_type &val) const {
-        if (val.first <= lastValue) {
+        if (val.value <= lastValue) {
             ok = false;
         }
-        count_verify += val.second;
+        count_verify += val.count;
     }
 };
 
@@ -32,7 +32,7 @@ bool testCase (size_t count) {
         bst.add (randRange (-10000, 10000));
     }
     TraverseFunc func;
-    bst.inorderIterate (BinarySearchTree<int>::ROOT_NODE, func);
+    bst.inorderIterate (bst.getRoot(), func);
     return func.ok && func.count_verify == count;
 }
 

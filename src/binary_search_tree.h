@@ -6,64 +6,71 @@
 #include <utility>
 #include "vector_as_tree.h"
 
+template <class T>
+struct BSTNode {
+    T value;
+    unsigned count;
+    BSTNode () 
+    : value()
+    , count(1) {
+    }
+    explicit BSTNode (const T &val)
+    : value(val)
+    , count(1) {
+    }
+    BSTNode (const T &val, unsigned c)
+    : value(val)
+    , count(c) {
+    }
+};
+
 template <class T, class Comp=std::less<T> > 
-class BinarySearchTree: public VectorAsBinaryTree<T, int> {
+class BinarySearchTree: public BinaryTree<BSTNode<T> > {
 public:
-    typedef VectorAsBinaryTree<T, int> base_type;
+    typedef BinaryTree<BSTNode<T> > base_type;
     typedef typename base_type::value_type value_type;
+    typedef typename base_type::node_type node_type;
 public:
     void add (const T &val) {
-        if (this->size() == 0) {
-            this->setRoot (value_type(val, 1));
+        if (!this->getRoot()) {
+            this->setRoot (value_type(val));
         } else {
-            add_r (base_type::ROOT_NODE, val);
+            add_r (this->getRoot(), val);
         }
     }
     int find (const T &val) {
-        if (this->size() == 0) {
+        if (!this->getRoot()) {
             return 0;
         }
-        return find_r (0, val);
+        return find_r (this->getRoot(), val);
     }
 private:
-    int find_r (int node, const T &val) const {
-        const T &curVal = this->value(node).first;
+    int find_r (node_type *node, const T &val) const {
+        const T &curVal = node->value.value;
         if (Comp()(curVal, val)) {
-            int right = this->getRight(node);
-            if (right == base_type::INVALID_NODE) {
-                return 0;
-            } else {
-                return find_r (right, val);
-            }
+            return node->right ? find_r (node->right, val) : 0;
         } else if (Comp()(val, curVal)) {
-            int left = this->getLeft(node);
-            if (left == base_type::INVALID_NODE) {
-                return 0;
-            } else {
-                return find_r (left, val);
-            }
+            return node->left ? find_r (node->left, val) : 0;
         } else {
-            return this->value(node).second;
+            return node->value.count;
         }
     }
-    void add_r (int node, const T &val) {
-        const T &curVal = this->value(node).first;
+    void add_r (node_type *node, const T &val) {
+        const T &curVal = node->value.value;
         if (Comp()(curVal, val)) {
-            int right = this->getRight(node);
-            if (right == base_type::INVALID_NODE) {
-                this->addRight (node, value_type(val, 1));
+            if (node->right) {
+                add_r (node->right, val);
             } else {
-                add_r (right, val);
+                node->right = new node_type (value_type(val), node);
             }
         } else if (Comp()(val, curVal)) {
-            int left = this->getLeft(node);
-            if (left == base_type::INVALID_NODE) {
-                this->addLeft (node, value_type(val, 1));
+            if (node->left) {
+                add_r (node->left, val);
             } else {
-                add_r (left, val);
+                node->left = new node_type (value_type(val), node);
             }
         } else {
-            this->value(node).second++;
+            node->value.count++;
         }
     }
 };

@@ -5,6 +5,7 @@
 #include <string>
 #include <cstdio>
 #include <ctime>
+#include <cstddef>
 #include <cstdarg>
 #include <climits>
 #include "random.h"
@@ -29,12 +30,12 @@ inline unsigned long long rdtsc() {
 #endif
 
 struct Timing {
-    unsigned long long ts;
+    long ts;
     void begin () {
-        ts = rdtsc ();
+        ts = clock ();
     }
-    unsigned long long end () {
-		return rdtsc() - ts;
+    long end () {
+		return (clock() - ts) * 1000 / CLOCKS_PER_SEC;
     }
 };
 
