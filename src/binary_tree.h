@@ -19,12 +19,10 @@ public:
     typedef T value_type;
     typedef struct Node {
         value_type value;
-        Node *parent;
         Node *left;
         Node *right;
         Node (const value_type &val, Node *p = NULL)
         : value(val)
-        , parent(p)
         , left(NULL)
         , right(NULL) {
         }
@@ -34,40 +32,17 @@ public:
             return s.str();
         }
     } node_type;
-protected:
-    node_type *_root;
+    node_type *root;
 private:
     BinaryTree (const BinaryTree&);
     void operator = (const BinaryTree&);
 public:
     BinaryTree () {
-        _root = NULL;
-    }
-    BinaryTree (const value_type &value) {
-        _root = new Node (value);
+        root = NULL;
     }
     virtual ~BinaryTree () {
         clear ();
     }
-    node_type *getRoot () const {
-        return this->_root;
-    }
-    void setRoot (const value_type &value) {
-        clear ();
-        _root = new Node (value);
-    }
-	void setLeft(node_type* node, node_type* child) const {
-		node->left = child;
-		if (child) {
-			child->parent = node;
-		}
-	}
-	void setRight(node_type* node, node_type* child) const {
-		node->right = child;
-		if (child) {
-			child->parent = node;
-		}
-	}
     void deleteLeft (node_type *node) const {
         if (node && node->left) {
             deleteLeft (node->left);
@@ -85,11 +60,11 @@ public:
         }
     }
     void clear () {
-        if (_root) {
-            deleteLeft (_root);
-            deleteRight (_root);
-            delete _root;
-            _root = NULL;
+        if (root) {
+            deleteLeft (root);
+            deleteRight (root);
+            delete root;
+            root = NULL;
         }
     }
     template <class Pred>

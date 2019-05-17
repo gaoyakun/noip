@@ -4,6 +4,7 @@
 
 #include <functional>
 #include <utility>
+#include <algorithm>
 #include "binary_tree.h"
 
 template <class T>
@@ -45,14 +46,14 @@ public:
     typedef typename base_type::node_type node_type;
 public:
     void add (const T &val) {
-        if (!this->getRoot()) {
-            this->setRoot (value_type(val));
+        if (!this->root) {
+            this->root = new node_type (value_type(val), NULL);
         } else {
-            add_r (this->getRoot(), val);
+            this->root = add_r (this->root, val);
         }
     }
-    int find (const T &val) {
-        return this->getRoot() ? find_r (this->getRoot(), val) : 0;
+    node_type *find (const T &val) {
+        return this->root ? find_r (this->root, val) : NULL;
     }
 private:
 	int getHeight(node_type* node) const {
@@ -60,99 +61,69 @@ private:
 	}
 	void updateHeight(node_type *node) const {
 		if (node) {
-			node->value.height = max2(getHeight(node->left), getHeight(node->right)) + 1;
+			node->value.height = std::max(getHeight(node->left), getHeight(node->right)) + 1;
 		}
 	}
-	int max2(int a, int b) const {
-		return a > b ? a : b;
-	}
-    int find_r (node_type *node, const T &val) const {
+    node_type *find_r (node_type *node, const T &val) const {
         const T &curVal = node->value.value;
         if (Comp()(curVal, val)) {
-            return node->right ? find_r (node->right, val) : 0;
+            return node->right ? find_r (node->right, val) : NULL;
         } else if (Comp()(val, curVal)) {
-            return node->left ? find_r (node->left, val) : 0;
+            return node->left ? find_r (node->left, val) : NULL;
         } else {
-            return node->value.count;
+            return node;
         }
     }
-    void add_r (node_type *node, const T &val) {
+    node_type *add_r (node_type *node, const T &val) {
         const T &curVal = node->value.value;
         if (Comp()(curVal, val)) {
-            if (node->right) {
-                add_r (node->right, val);
-				if (getHeight(node->right) - getHeight(node->left) == 2) {
-					maintainRight(node);
-				}
-            } else {
-                node->right = new node_type (value_type(val), node);
-				if (node->value.height < 2) {
-					node->value.height = 2;
-				}
-            }
+            node->right = node->right ? add_r (node->right, val) : new node_type (value_type(val), node);
         } else if (Comp()(val, curVal)) {
-            if (node->left) {
-                add_r (node->left, val);
-				if (getHeight(node->left) - getHeight(node->right) == 2) {
-					maintainLeft(node);
-				}
-            } else {
-                node->left = new node_type (value_type(val), node);
-				if (node->value.height < 2) {
-					node->value.height = 2;
-				}
-			}
+            node->left = node->left ? add_r (node->left, val) : new node_type (value_type(val), node);
         } else {
             node->value.count++;
+            return node;
+        }
+        updateHeight (node);
+        int hl = getHeight (node->left);
+        int hr = getHeight (node->right);
+        if (hr - hl == 2) {
+            return maintainRight(node);
+        } else if (hl - hr == 2) {
+            return maintainLeft(node);
+        } else {
+            return node;
         }
     }
-    void maintainLeft (node_type *node) {
+    node_type *maintainLeft (node_type *node) {
         if (getHeight(node->left->left) < getHeight(node->left->right)) {
-            rotateLeft (node->left);
+            node->left = rotateLeft (node->left);
         }
-        rotateRight (node);
+        return rotateRight (node);
     }
-    void maintainRight (node_type *node) {
+    node_type *maintainRight (node_type *node) {
         if (getHeight(node->right->left) > getHeight(node->right->right)) {
-            rotateRight (node->right);
+            node->right = rotateRight (node->right);
         }
-        rotateLeft (node);
+        return rotateLeft (node);
     }
-    void rotateLeft (node_type *node) {
-        if (node->parent) {
-            if (node->parent->left == node) {
-				this->setLeft(node->parent, node->right);
-            } else {
-				this->setRight(node->parent, node->right);
-            }
-		} else {
-			this->_root = node->right;
-			node->right->parent = NULL;
-		}
-        node_type *tmp = node->right->left;
-		this->setLeft(node->right, node);
-		this->setRight(node, tmp);
+    node_type *rotateLeft (node_type *node) {
+        node_type *x = node->right;
+        node_type *t = x->left;
+        x->left = node;
+        node->right = t;
 		updateHeight(node);
-		updateHeight(node->parent);
-		updateHeight(node->parent->parent);
+		updateHeight(x);
+        return x;
     }
-    void rotateRight (node_type *node) {
-        if (node->parent) {
-            if (node->parent->left == node) {
-				this->setLeft(node->parent, node->left);
-            } else {
-				this->setRight(node->parent, node->left);
-            }
-		} else {
-			this->_root = node->left;
-			node->left->parent = NULL;
-		}
-        node_type *tmp = node->left->right;
-		this->setRight(node->left, node);
-		this->setLeft(node, tmp);
+    node_type *rotateRight (node_type *node) {
+        node_type *x = node->left;
+        node_type *t = x->right;
+        x->right = node;
+        node->left = t;
 		updateHeight(node);
-		updateHeight(node->parent);
-		updateHeight(node->parent->parent);
+		updateHeight(x);
+        return x;
     }
 };
 

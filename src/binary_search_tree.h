@@ -44,31 +44,28 @@ public:
     typedef typename base_type::value_type value_type;
     typedef typename base_type::node_type node_type;
 public:
-    node_type *getRoot () const {
-        return this->_root;
-    }
     void add (const T &val) {
-        if (!this->getRoot()) {
-            this->setRoot (value_type(val));
+        if (!this->root) {
+            this->root = new node_type(value_type(val));
         } else {
-            add_r (this->getRoot(), val);
+            add_r (this->root, val);
         }
     }
-    int find (const T &val) {
-        if (!this->getRoot()) {
-            return 0;
+    node_type *find (const T &val) const {
+        if (!this->root) {
+            return NULL;
         }
-        return find_r (this->getRoot(), val);
+        return find_r (this->root, val);
     }
 private:
-    int find_r (node_type *node, const T &val) const {
+    node_type *find_r (node_type *node, const T &val) const {
         const T &curVal = node->value.value;
         if (Comp()(curVal, val)) {
-            return node->right ? find_r (node->right, val) : 0;
+            return node->right ? find_r (node->right, val) : NULL;
         } else if (Comp()(val, curVal)) {
-            return node->left ? find_r (node->left, val) : 0;
+            return node->left ? find_r (node->left, val) : NULL;
         } else {
-            return node->value.count;
+            return node;
         }
     }
     void add_r (node_type *node, const T &val) {

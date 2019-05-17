@@ -39,21 +39,21 @@ bool testCase (size_t count) {
     }
 	{
 		TraverseFunc func;
-		bst.inorderIterate (bst.getRoot(), func);
+		bst.inorderIterate (bst.root, func);
 		bool ret = func.ok && func.count_verify == count;
 		if (!ret) {
 			BinaryTreeDebugger debugger;
-			debugger.print_ascii_tree(bst.getRoot());
+			debugger.print_ascii_tree(bst.root);
 			return false;
 		}
 	}
 	{
 		TraverseFunc func;
-		avl.inorderIterate(avl.getRoot(), func);
+		avl.inorderIterate(avl.root, func);
 		bool ret = func.ok && func.count_verify == count;
 		if (!ret) {
 			BinaryTreeDebugger debugger;
-			debugger.print_ascii_tree(bst.getRoot());
+			debugger.print_ascii_tree(avl.root);
 			return false;
 		}
 	}
@@ -70,7 +70,7 @@ int debugBST () {
             cin >> value;
             bst.add (value);
             BinaryTreeDebugger debugger;
-            debugger.print_ascii_tree (bst.getRoot());
+            debugger.print_ascii_tree (bst.root);
         } else if (cmd == 'q') {
             return 0;
         }
@@ -86,7 +86,7 @@ int main (int argc, char *argv[]) {
     }
     const size_t count = atoi(argv[1]);
     const size_t times = atoi(argv[2]);
-	const clock_t seed = 162;// rdtsc() % 1000;
+	const clock_t seed = time(NULL) % 1000;
     cout << "Random seed: " << seed << endl;
     randomSeed (seed);
 
