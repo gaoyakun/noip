@@ -9,30 +9,38 @@
 template <class T>
 struct AVLNode {
     T value;
-    int balanceFactor;
+    int height;
     unsigned count;
     AVLNode () 
     : value()
-    , balanceFactor(0)
+    , height(1)
     , count(1) {
     }
     explicit AVLNode (const T &val)
     : value(val)
-    , balanceFactor(0)
+    , height(1)
     , count(1) {
     }
     AVLNode (const T &val, unsigned c)
     : value(val)
-    , balanceFactor(0)
+    , height(1)
     , count(c) {
     }
 };
 
+template <class T>
+struct AVLSerialize {
+	void operator () (std::ostringstream& s, const AVLNode<T>& t) {
+		s << t.value << "(" << t.count << ")(" << t.height << ")";
+	}
+};
+
+
 
 template <class T, class Comp=std::less<T> > 
-class AVLTree: public BinaryTree<AVLNode<T> > {
+class AVLTree: public BinaryTree<AVLNode<T>, AVLSerialize<T> > {
 public:
-    typedef BinaryTree<AVLNode<T> > base_type;
+    typedef BinaryTree<AVLNode<T>, AVLSerialize<T> > base_type;
     typedef typename base_type::value_type value_type;
     typedef typename base_type::node_type node_type;
 public:
@@ -40,22 +48,24 @@ public:
         if (!this->getRoot()) {
             this->setRoot (value_type(val));
         } else {
-            node_type *rotateNode = NULL;
-            add_r (this->getRoot(), val, rotateNode);
-            if (rotateNode) {
-                int bf = rotateNode->value.balanceFactor;
-                if (bf == 2) {
-                    maintainLeft(rotateNode);
-                } else {
-                    maintainRight(rotateNode);
-                }
-            }
+            add_r (this->getRoot(), val);
         }
     }
     int find (const T &val) {
         return this->getRoot() ? find_r (this->getRoot(), val) : 0;
     }
 private:
+	int getHeight(node_type* node) const {
+		return node ? node->value.height : 0;
+	}
+	void updateHeight(node_type *node) const {
+		if (node) {
+			node->value.height = max2(getHeight(node->left), getHeight(node->right)) + 1;
+		}
+	}
+	int max2(int a, int b) const {
+		return a > b ? a : b;
+	}
     int find_r (node_type *node, const T &val) const {
         const T &curVal = node->value.value;
         if (Comp()(curVal, val)) {
@@ -66,77 +76,83 @@ private:
             return node->value.count;
         }
     }
-    int add_r (node_type *node, const T &val, node_type *&rotateNode) {
+    void add_r (node_type *node, const T &val) {
         const T &curVal = node->value.value;
-        if (node->balanceFactor) {
-            rotateNode = node;
-        }
-        int d = 0;
         if (Comp()(curVal, val)) {
             if (node->right) {
-                d = -add_r (node->right, val, rotateNode);
+                add_r (node->right, val);
+				if (getHeight(node->right) - getHeight(node->left) == 2) {
+					maintainRight(node);
+				}
             } else {
                 node->right = new node_type (value_type(val), node);
-                d = -1;
+				if (node->value.height < 2) {
+					node->value.height = 2;
+				}
             }
         } else if (Comp()(val, curVal)) {
             if (node->left) {
-                d = add_r (node->left, val, rotateNode);
+                add_r (node->left, val);
+				if (getHeight(node->left) - getHeight(node->right) == 2) {
+					maintainLeft(node);
+				}
             } else {
                 node->left = new node_type (value_type(val), node);
-                d = 1;
-            }
+				if (node->value.height < 2) {
+					node->value.height = 2;
+				}
+			}
         } else {
             node->value.count++;
         }
-        node->balanceFactor += d;
-        return node->balanceFactor && node != rotateNode ? 1 : 0;
     }
     void maintainLeft (node_type *node) {
-        if (node->left->value.balanceFactor < 0) {
-            rotateLeft (node->right);
+        if (getHeight(node->left->left) < getHeight(node->left->right)) {
+            rotateLeft (node->left);
         }
         rotateRight (node);
     }
     void maintainRight (node_type *node) {
-        if (node->right->value.balanceFactor > 0) {
-            rotateRight (node->left);
+        if (getHeight(node->right->left) > getHeight(node->right->right)) {
+            rotateRight (node->right);
         }
         rotateLeft (node);
     }
     void rotateLeft (node_type *node) {
         if (node->parent) {
             if (node->parent->left == node) {
-                node->parent->left = node->right;
+				this->setLeft(node->parent, node->right);
             } else {
-                node->parent->right = node->right;
+				this->setRight(node->parent, node->right);
             }
-            node->right->parent = node->parent;
-        }
+		} else {
+			this->_root = node->right;
+			node->right->parent = NULL;
+		}
         node_type *tmp = node->right->left;
-        node->right->left = node;
-        node->parent = node->right;
-        node->right = tmp;
-        int dr = node->value.balanceFactor - (node->parent->value.balanceFactor >= 0 ? -1 : node->parent->value.balanaceFactor - 1); 
-        node->parent->value.balanceFactor = node->value.balanceFactor + 2;
-        node->value.balanceFactor = dr;
+		this->setLeft(node->right, node);
+		this->setRight(node, tmp);
+		updateHeight(node);
+		updateHeight(node->parent);
+		updateHeight(node->parent->parent);
     }
     void rotateRight (node_type *node) {
         if (node->parent) {
             if (node->parent->left == node) {
-                node->parent->left = node->left;
+				this->setLeft(node->parent, node->left);
             } else {
-                node->parent->right = node->left;
+				this->setRight(node->parent, node->left);
             }
-            node->left->parent = node->parent;
-        }
+		} else {
+			this->_root = node->left;
+			node->left->parent = NULL;
+		}
         node_type *tmp = node->left->right;
-        node->left->right = node;
-        node->parent = node->left;
-        node->left = tmp;
-        int dl = node->value.balanceFactor + (node->parent->value.balanceFactor <= 0 ? -1 : -node->parent->value.balanaceFactor - 1); 
-        node->parent->value.balanceFactor = node->value.balanceFactor - 2;
-        node->value.balanceFactor = dl;
+		this->setRight(node->left, node);
+		this->setLeft(node, tmp);
+		updateHeight(node);
+		updateHeight(node->parent);
+		updateHeight(node->parent->parent);
     }
 };
 

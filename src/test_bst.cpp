@@ -4,6 +4,7 @@
 #include "binary_tree.h"
 #include "binary_tree_debug.h"
 #include "binary_search_tree.h"
+#include "avl_tree.h"
 
 using std::cin;
 using std::cout;
@@ -19,7 +20,8 @@ struct TraverseFunc {
         count_verify = 0;
         ok = true;
     }
-    void operator () (const BinarySearchTree<int>::value_type &val) const {
+	template <class T>
+    void operator () (const T &val) const {
         if (val.value <= lastValue) {
             ok = false;
         }
@@ -28,27 +30,38 @@ struct TraverseFunc {
 };
 
 bool testCase (size_t count) {
-    BinarySearchTree<int> bst;
+	BinarySearchTree<int> bst;
+    AVLTree<int> avl;
     for (size_t i = 0; i < count; i++) {
-        bst.add (randRange (-10000, 10000));
+		int val = randRange(-100, 100);
+        bst.add (val);
+		avl.add(val);
     }
-    TraverseFunc func;
-    bst.inorderIterate (bst.getRoot(), func);
-    return func.ok && func.count_verify == count;
+	{
+		TraverseFunc func;
+		bst.inorderIterate (bst.getRoot(), func);
+		bool ret = func.ok && func.count_verify == count;
+		if (!ret) {
+			BinaryTreeDebugger debugger;
+			debugger.print_ascii_tree(bst.getRoot());
+			return false;
+		}
+	}
+	{
+		TraverseFunc func;
+		avl.inorderIterate(avl.getRoot(), func);
+		bool ret = func.ok && func.count_verify == count;
+		if (!ret) {
+			BinaryTreeDebugger debugger;
+			debugger.print_ascii_tree(bst.getRoot());
+			return false;
+		}
+	}
+	return true;
 }
 
 int debugBST () {
-    BinarySearchTree<int> bst;
-    bst.add (1);
-    bst.add (2);
-    bst.add (3);
-    bst.add (4);
-    bst.add (-1);
-    bst.add (-2);
-    bst.add (-4);
-    bst.add (-3);
-    BinaryTreeDebugger debugger;
-    debugger.print_ascii_tree (bst.getRoot());
+	AVLTree<int> bst;
     for (;;) {
         char cmd;
         cin >> cmd;
@@ -73,7 +86,7 @@ int main (int argc, char *argv[]) {
     }
     const size_t count = atoi(argv[1]);
     const size_t times = atoi(argv[2]);
-    const clock_t seed = rdtsc() % 1000;
+	const clock_t seed = 162;// rdtsc() % 1000;
     cout << "Random seed: " << seed << endl;
     randomSeed (seed);
 

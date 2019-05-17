@@ -27,6 +27,10 @@ struct asciinode_struct {
 
 
 #define MAX_HEIGHT 1000
+
+#ifdef INFINITY
+#undef INFINITY
+#endif
 #define INFINITY (1<<20)
 
 class BinaryTreeDebugger {
@@ -56,7 +60,7 @@ public:
 
         if (t == NULL) return NULL;
 
-        node = (asciinode*)malloc(sizeof(asciinode));
+        node = new asciinode;
         node->left = build_ascii_tree_recursive(t->left);
         node->right = build_ascii_tree_recursive(t->right);
 
@@ -89,7 +93,7 @@ public:
         if (node == NULL) return;
         free_ascii_tree(node->left);
         free_ascii_tree(node->right);
-        free(node);
+        delete node;
     }
 
     //The following function fills in the lprofile array for the given tree.

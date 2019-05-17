@@ -56,6 +56,18 @@ public:
         clear ();
         _root = new Node (value);
     }
+	void setLeft(node_type* node, node_type* child) const {
+		node->left = child;
+		if (child) {
+			child->parent = node;
+		}
+	}
+	void setRight(node_type* node, node_type* child) const {
+		node->right = child;
+		if (child) {
+			child->parent = node;
+		}
+	}
     void deleteLeft (node_type *node) const {
         if (node && node->left) {
             deleteLeft (node->left);
