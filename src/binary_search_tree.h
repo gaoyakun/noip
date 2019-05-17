@@ -4,6 +4,7 @@
 
 #include <functional>
 #include <utility>
+#include <sstream>
 #include "vector_as_tree.h"
 
 template <class T>
@@ -22,15 +23,30 @@ struct BSTNode {
     : value(val)
     , count(c) {
     }
+    std::string toString () const {
+        std::ostringstream s;
+        s << value << "(" << count << ")";
+        return s.str();
+    }
+};
+
+template <class T>
+struct BSTSerialize {
+    void operator () (std::ostringstream &s, const BSTNode<T> &t) {
+        s << t.value << "(" << t.count << ")";
+    }
 };
 
 template <class T, class Comp=std::less<T> > 
-class BinarySearchTree: public BinaryTree<BSTNode<T> > {
+class BinarySearchTree: public BinaryTree<BSTNode<T>, BSTSerialize<T> > {
 public:
-    typedef BinaryTree<BSTNode<T> > base_type;
+    typedef BinaryTree<BSTNode<T>, BSTSerialize<T> > base_type;
     typedef typename base_type::value_type value_type;
     typedef typename base_type::node_type node_type;
 public:
+    node_type *getRoot () const {
+        return this->_root;
+    }
     void add (const T &val) {
         if (!this->getRoot()) {
             this->setRoot (value_type(val));

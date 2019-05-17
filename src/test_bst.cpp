@@ -2,6 +2,7 @@
 #include <cstdlib>
 #include "test_common.h"
 #include "binary_tree.h"
+#include "binary_tree_debug.h"
 #include "binary_search_tree.h"
 
 using std::cin;
@@ -36,8 +37,37 @@ bool testCase (size_t count) {
     return func.ok && func.count_verify == count;
 }
 
+int debugBST () {
+    BinarySearchTree<int> bst;
+    bst.add (1);
+    bst.add (2);
+    bst.add (3);
+    bst.add (4);
+    bst.add (-1);
+    bst.add (-2);
+    bst.add (-4);
+    bst.add (-3);
+    BinaryTreeDebugger debugger;
+    debugger.print_ascii_tree (bst.getRoot());
+    for (;;) {
+        char cmd;
+        cin >> cmd;
+        if (cmd == 'a') {
+            int value;
+            cin >> value;
+            bst.add (value);
+            BinaryTreeDebugger debugger;
+            debugger.print_ascii_tree (bst.getRoot());
+        } else if (cmd == 'q') {
+            return 0;
+        }
+    }
+}
+
 int main (int argc, char *argv[]) {
-    if (argc != 3) {
+    if (argc == 1) {
+        return debugBST ();
+    } else if (argc != 3) {
         cout << "Usage: test_bitop ARRAY_SIZE TEST_COUNT" << endl;
         return 1;
     }

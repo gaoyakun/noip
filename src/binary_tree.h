@@ -4,8 +4,16 @@
 #include <cstddef>
 #include <functional>
 #include <utility>
+#include <sstream>
 
 template <class T>
+struct DefaultSerialize {
+    void operator () (std::ostringstream &s, const T &t) {
+        s << t;
+    }
+};
+
+template <class T, class P=DefaultSerialize<T> >
 class BinaryTree {
 public:
     typedef T value_type;
@@ -20,7 +28,13 @@ public:
         , left(NULL)
         , right(NULL) {
         }
+        std::string toString () const {
+            std::ostringstream s;
+            P() (s, value);
+            return s.str();
+        }
     } node_type;
+protected:
     node_type *_root;
 private:
     BinaryTree (const BinaryTree&);
