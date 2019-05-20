@@ -37,29 +37,40 @@ struct BSTSerialize {
     }
 };
 
+template <class T>
+struct KeyType<BSTNode<T> > {
+    typedef T key_type;
+};
+
 template <class T, class Comp=std::less<T> > 
 class BinarySearchTree: public BinaryTree<BSTNode<T>, BSTSerialize<T> > {
 public:
     typedef BinaryTree<BSTNode<T>, BSTSerialize<T> > base_type;
     typedef typename base_type::value_type value_type;
+    typedef T key_type;
     typedef typename base_type::node_type node_type;
 public:
-    void add (const T &val) {
+    void add (const key_type &val) {
         if (!this->root) {
             this->root = new node_type(value_type(val));
         } else {
             add_r (this->root, val);
         }
     }
-    node_type *find (const T &val) const {
+    void remove (const key_type &val) {
+        if (this->root) {
+            this->root = remove_r (this->root, val);
+        }
+    }
+    node_type *find (const key_type &val) const {
         if (!this->root) {
             return NULL;
         }
         return find_r (this->root, val);
     }
 private:
-    node_type *find_r (node_type *node, const T &val) const {
-        const T &curVal = node->value.value;
+    node_type *find_r (node_type *node, const key_type &val) const {
+        const key_type &curVal = node->value.value;
         if (Comp()(curVal, val)) {
             return node->right ? find_r (node->right, val) : NULL;
         } else if (Comp()(val, curVal)) {
@@ -68,8 +79,8 @@ private:
             return node;
         }
     }
-    void add_r (node_type *node, const T &val) {
-        const T &curVal = node->value.value;
+    void add_r (node_type *node, const key_type &val) {
+        const key_type &curVal = node->value.value;
         if (Comp()(curVal, val)) {
             if (node->right) {
                 add_r (node->right, val);
@@ -84,6 +95,45 @@ private:
             }
         } else {
             node->value.count++;
+        }
+    }
+    node_type *remove_r (node_type *node, const key_type &val) {
+        const key_type &curVal = node->value.value;
+        if (Comp()(curVal, val)) {
+            if (node->right) {
+                node->right = remove_r (node->right, val);
+            }
+        } else if (Comp()(val, curVal)) {
+            if (node->left) {
+                node->left = remove_r (node->left, val);
+            }
+        } else {
+            node->value.count--;
+            if (node->value.count == 0) {
+                if (node->left) {
+                    node_type *p = node->left;
+                    node_type *t = p->right;
+                    while (t && t->right) {
+                        p = t;
+                        t = t->right;
+                    }
+                    if (t) {
+                        p->right = t->left;
+                        t->left = node->left;
+                        delete node;
+                        return t;
+                    } else {
+                        delete node;
+                        return p;
+                    }
+                } else if (node->right) {
+                    delete node;
+                    return node->right;
+                } else {
+                    delete node;
+                    return NULL;
+                }
+            }
         }
     }
 };

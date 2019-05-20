@@ -13,11 +13,18 @@ struct DefaultSerialize {
     }
 };
 
+template <class T>
+struct KeyType {
+    typedef T key_type;
+};
+
 template <class T, class P=DefaultSerialize<T> >
 class BinaryTree {
 public:
     typedef T value_type;
+    typedef T key_type;
     typedef struct Node {
+        typedef typename KeyType<value_type>::key_type key_type;
         value_type value;
         Node *left;
         Node *right;

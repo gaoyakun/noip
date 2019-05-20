@@ -5,6 +5,7 @@
 #include "binary_tree_debug.h"
 #include "binary_search_tree.h"
 #include "avl_tree.h"
+#include "binary_tree_funcs.h"
 
 using std::cin;
 using std::cout;
@@ -71,6 +72,67 @@ int debugBST () {
             bst.add (value);
             BinaryTreeDebugger debugger;
             debugger.print_ascii_tree (bst.root);
+        } else if (cmd == 'A') {
+            int value1, value2;
+            cin >> value1 >> value2;
+            for (; value1 <= value2; value1++) {
+                bst.add (value1);
+            }
+            BinaryTreeDebugger debugger;
+            debugger.print_ascii_tree (bst.root);
+        } else if (cmd == 'k') {
+            int k;
+            cin >> k;
+            const AVLTree<int>::node_type *node = avl_find_kth (bst.root, k);
+            if (node) {
+                cout << node->value.value << endl;
+            } else {
+                cout << "not found" << endl;
+            }
+        } else if (cmd == 'r') {
+            int val;
+            cin >> val;
+            cout << avl_get_rank (bst.root, val) << endl;
+        } else if (cmd == 'm') {
+            const AVLTree<int>::node_type *node = bst_find_min (bst.root);
+            if (node) {
+                cout << node->value.value << endl;
+            } else {
+                cout << "not found" << endl;
+            }
+        } else if (cmd == 'n') {
+            int val;
+            cin >> val;
+            const AVLTree<int>::node_type *node = bst_get_next (bst.root, val);
+            if (node) {
+                cout << node->value.value << endl;
+            } else {
+                cout << "not found" << endl;
+            }
+        } else if (cmd == 'p') {
+            int val;
+            cin >> val;
+            const AVLTree<int>::node_type *node = bst_get_prev (bst.root, val);
+            if (node) {
+                cout << node->value.value << endl;
+            } else {
+                cout << "not found" << endl;
+            }
+        } else if (cmd == 'd') {
+            int val;
+            cin >> val;
+            bst.remove (val);
+            BinaryTreeDebugger debugger;
+            debugger.print_ascii_tree (bst.root);
+        } else if (cmd == 'M') {
+            const AVLTree<int>::node_type *node = bst_find_max (bst.root);
+            if (node) {
+                cout << node->value.value << endl;
+            } else {
+                cout << "not found" << endl;
+            }
+        } else if (cmd == 'c') {
+            bst.clear ();
         } else if (cmd == 'q') {
             return 0;
         }
