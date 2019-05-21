@@ -32,26 +32,26 @@ namespace detail {
 }
 
 template <class T = unsigned long long>
-class BigDecimal;
+class DecimalT;
 
-typedef BigDecimal<> Decimal;
+typedef DecimalT<> Decimal;
 
 template <class T>
-class BigDecimal {
+class DecimalT {
     typedef std::vector<T> data_type;
     data_type _data;
 public:
     static const int decimal_size = detail::UnitSize<T>::value/2;
     static const T base = detail::UnitBase<T, decimal_size>::value;
     typedef T native_type;
-    typedef BigDecimal<T> self_type;
-    BigDecimal () {
+    typedef DecimalT<T> self_type;
+    DecimalT () {
         set (0);
     }
-    BigDecimal (native_type value) {
+    DecimalT (native_type value) {
         set (value);
     }
-    BigDecimal (const std::string &s) {
+    DecimalT (const std::string &s) {
         set (s);
     }
 public:
@@ -120,14 +120,14 @@ public:
             i++;
         }
         s.erase (0, i);
-        
+
         _data.resize(0);
         while (s.length()) {
             unsigned len = s.length();
             if (len > decimal_size) {
                 len = decimal_size;
             }
-            T value = 0;
+            native_type value = 0;
             unsigned pos = s.length() - len;
             for (unsigned i = s.length() - len; i < s.length(); i++) {
                 value = value * 10 + (s[i] - '0');
@@ -188,20 +188,20 @@ public:
     }
     self_type add (const self_type &other) const {
         self_type result;
-        T carry = 0;
+        native_type carry = 0;
         unsigned len1 = _data.size();
         unsigned len2 = other._data.size();
         const data_type &a = len1 < len2 ? _data : other._data;
         const data_type &b = len1 < len2 ? other._data : _data;
         result._data.resize(0);
         for (unsigned i = 0; i < len1; i++) {
-            T val = a[i] + b[i] + carry;
+            native_type val = a[i] + b[i] + carry;
             carry = val / base;
             val %= base;
             result._data.push_back (val);
         } 
         for (unsigned i = len1; i < len2; i++) {
-            T val = b[i] + carry;
+            native_type val = b[i] + carry;
             carry = val / base;
             val %= base;
             result._data.push_back (val);
