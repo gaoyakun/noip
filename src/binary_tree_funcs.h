@@ -4,6 +4,7 @@
 #include "binary_tree.h"
 #include "binary_search_tree.h"
 #include "avl_tree.h"
+#include "binary_tree_debug.h"
 
 namespace {
     template <class NodeType>
@@ -109,5 +110,10 @@ const NodeType *bst_find_max (const NodeType *root) {
     return root;
 }
 
+template <class NodeType>
+void tree_print (const NodeType *root) {
+    BinaryTreeDebugger debugger;
+    debugger.print_ascii_tree (root);    
+}
 
 #endif // __BINARY_TREE_FUNCS_H__
