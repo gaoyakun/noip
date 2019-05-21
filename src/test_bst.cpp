@@ -124,6 +124,14 @@ int debugBST () {
             bst.remove (val);
             BinaryTreeDebugger debugger;
             debugger.print_ascii_tree (bst.root);
+        } else if (cmd == 'D') {
+            int value1, value2;
+            cin >> value1 >> value2;
+            for (; value1 <= value2; value1++) {
+                bst.remove (value1);
+            }
+            BinaryTreeDebugger debugger;
+            debugger.print_ascii_tree (bst.root);
         } else if (cmd == 'M') {
             const AVLTree<int>::node_type *node = bst_find_max (bst.root);
             if (node) {

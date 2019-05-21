@@ -12,7 +12,7 @@ struct AVLNode {
     T value;
     int height;
     int size;
-    unsigned count;
+    int count;
     AVLNode () 
     : value()
     , height(1)
@@ -149,7 +149,6 @@ private:
                 } else {
                     p = remove_maxnode_r (node->right);
                     p->left = node->left;
-                    p->right = node->right;
                 }
                 delete node;
                 node = p;

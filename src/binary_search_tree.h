@@ -10,7 +10,7 @@
 template <class T>
 struct BSTNode {
     T value;
-    unsigned count;
+    int count;
     BSTNode () 
     : value()
     , count(1) {

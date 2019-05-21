@@ -38,10 +38,10 @@ namespace {
             int leftSize = root->left ? root->left->value.size : 0;
             if (k <= leftSize) {
                 return root->left ? bst_find_kth_r (root->left, k) : NULL;
-            } else if (k == leftSize + 1) {
+            } else if (k <= leftSize + root->value.count) {
                 return root;
             } else if (root->right) {
-                return bst_find_kth_r (root->right, k - leftSize - 1);
+                return bst_find_kth_r (root->right, k - leftSize - root->value.count);
             } else {
                 return NULL;
             }
