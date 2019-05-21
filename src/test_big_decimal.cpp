@@ -8,6 +8,7 @@ using std::endl;
 int main () {
     Decimal a, b;
     cin >> a >> b;
+    cout << "add:" << a + b << endl;
     cout << "gt:" << (a > b) << endl;
     cout << "lt:" << (a < b) << endl;
     cout << "eq:" << (a == b) << endl;

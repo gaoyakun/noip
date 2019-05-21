@@ -114,6 +114,13 @@ public:
     }
     void fromString (const std::string &str) {
         std::string s = str;
+        // remove leading zeroes
+        unsigned i = 0;
+        while (i < s.length() && s[i] == '0') {
+            i++;
+        }
+        s.erase (0, i);
+        
         _data.resize(0);
         while (s.length()) {
             unsigned len = s.length();
