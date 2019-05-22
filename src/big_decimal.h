@@ -77,6 +77,12 @@ public:
     friend self_type operator + (const self_type &a, const self_type &b) {
         return a.add (b);
     }
+    friend self_type operator * (const self_type &a, native_type b) {
+        return a.mul (b);
+    }
+    friend self_type operator * (native_type a, const self_type &b) {
+        return b.mul (a);
+    }
     friend bool operator > (const self_type &a, const self_type &b) {
         return a.gt (b);
     }
@@ -99,8 +105,10 @@ public:
         return eq (0);
     }
     self_type & operator += (const self_type &other) {
-        *this = add (other);
-        return *this;
+        return inplaceAdd (other);
+    }
+    self_type & operator *= (native_type x) {
+        return inplaceMul (x);
     }
 public:
     self_type &set (native_type value) {
@@ -199,30 +207,39 @@ public:
             return true;
         }
     }
-    self_type add (const self_type &other) const {
-        self_type result;
+    self_type &inplaceMul (native_type x) {
         native_type carry = 0;
-        unsigned len1 = _data.size();
-        unsigned len2 = other._data.size();
-        const data_type &a = len1 < len2 ? _data : other._data;
-        const data_type &b = len1 < len2 ? other._data : _data;
-        result._data.resize(0);
-        for (unsigned i = 0; i < len1; i++) {
-            native_type val = a[i] + b[i] + carry;
+        for (unsigned i = 0; i < _data.size(); i++) {
+            native_type val = _data[i] * x + carry;
             carry = val / base;
-            val %= base;
-            result._data.push_back (val);
+            _data[i] = val % base;
         } 
-        for (unsigned i = len1; i < len2; i++) {
-            native_type val = b[i] + carry;
-            carry = val / base;
-            val %= base;
-            result._data.push_back (val);
-        }
         if (carry) {
-            result._data.push_back (carry);
+            _data.push_back (carry);
         }
-        return result;
+        return *this;
+    }
+    self_type mul (native_type x) const {
+        return self_type(*this).inplaceMul (x);
+    }
+    self_type &inplaceAdd (const self_type &other) {
+        native_type carry = 0;
+        unsigned len = other._data.size();
+        if (_data.size() < len) {
+            _data.resize (len, 0);
+        }
+        for (unsigned i = 0; i < _data.size(); i++) {
+            native_type val = _data[i] + (i < len ? other._data[i] : 0) + carry;
+            carry = val / base;
+            _data[i] = val % base;
+        } 
+        if (carry) {
+            _data.push_back (carry);
+        }
+        return *this;
+    }
+    self_type add (const self_type &other) const {
+        return self_type(*this).inplaceAdd (other);
     }
 };
 

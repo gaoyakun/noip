@@ -22,7 +22,7 @@ const Decimal &dp (const vector<int> &number, int i, int j, vector<vector<Decima
         } else {
             const Decimal &a = dp (number, i+1, j, cache);
             const Decimal &b = dp (number, i, j-1, cache);
-            cache[i][j] = max (number[i] + a + a, number[j] + b + b);
+            cache[i][j] = max (number[i] + a * 2, number[j] + b * 2);
         }
     }
     return cache[i][j];
@@ -56,7 +56,7 @@ int main () {
     for (unsigned j = 0; j < n; j++) {
         result += solveRow (matrix[j]);
     }
-    cout << result + result << endl;
+    cout << result * 2 << endl;
 
     return 0;
 }
