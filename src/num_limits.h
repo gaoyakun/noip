@@ -7,12 +7,9 @@
 template <class T>
 struct NumberLimits;
 
-template <>
-struct NumberLimits<char> {
-    enum {
-        max_value = CHAR_MAX,
-        min_value = CHAR_MIN
-    };
+template <class T>
+struct NumberTraits {
+    static const bool is_signed = NumberLimits<T>::min_value < 0;
 };
 
 template <>

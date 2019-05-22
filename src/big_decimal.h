@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <string>
+#include <iostream>
 #include <sstream>
 #include <iomanip>
 #include "num_limits.h"
@@ -46,7 +47,9 @@ public:
     typedef T native_type;
     typedef DecimalT<T> self_type;
     DecimalT () {
-        set (0);
+    }
+    DecimalT (const DecimalT &other)
+    : _data(other._data) {
     }
     DecimalT (native_type value) {
         set (value);
@@ -101,16 +104,22 @@ public:
     }
 public:
     self_type &set (native_type value) {
-        _data.resize(0);
+        invalidate();
         do {
-            _data.push_back (value % 10);
-            value /= 10;
+            _data.push_back (value % base);
+            value /= base;
         } while (value);
         return *this;
     }
     self_type &set (const std::string &value) {
         fromString (value);
         return *this;
+    }
+    bool isValid () const {
+        return !_data.empty();
+    }
+    void invalidate () {
+        _data.resize(0);
     }
     void fromString (const std::string &str) {
         std::string s = str;
@@ -121,7 +130,7 @@ public:
         }
         s.erase (0, i);
 
-        _data.resize(0);
+        invalidate();
         while (s.length()) {
             unsigned len = s.length();
             if (len > decimal_size) {
@@ -155,13 +164,15 @@ public:
             for (typename data_type::const_reverse_iterator it1 = this->_data.rbegin(), it2 = other._data.rbegin(); it1 != this->_data.rend(); it1++, it2++) {
                 if (*it1 > *it2) {
                     return true;
+                } else if (*it1 < *it2) {
+                    return false;
                 }
             }
             return false;
         }
     }
     bool lt (const self_type &other) const {
-        if (this->_data.size() < other._data.size()) {
+        if (_data.size() < other._data.size()) {
             return true;
         } else if (this->_data.size() > other._data.size()) {
             return false;
@@ -169,6 +180,8 @@ public:
             for (typename data_type::const_reverse_iterator it1 = this->_data.rbegin(), it2 = other._data.rbegin(); it1 != this->_data.rend(); it1++, it2++) {
                 if (*it1 < *it2) {
                     return true;
+                } else if (*it1 > *it2) {
+                    return false;
                 }
             }
             return false;
