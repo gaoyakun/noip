@@ -1,0 +1,33 @@
+@startuml
+title 在P子树中查找元素X的后继
+
+(*) --> "GetNext(P,X)"
+
+if "X不小于P的值?" then
+    -l->[是] if "P的右子树不为空?" then
+        -l->[是] "递归，返回GetNext(P.right,X)"
+    else
+        -->[否] "返回空"
+    endif
+else
+    -d->[否] "如果P的左子树不为空则令K等于GetNext(P.left,X)"
+    if "K不为空?" then
+        -r->[是] "返回K"
+    else
+        -->[否] if "P的元素数量大于0?" then
+            -r->[是] "返回P“
+        else
+            -->[否] if "P的右子树不为空?" then
+                -->[是] "递归，返回GetNext(P.right,X)"
+            else
+                -->[否] "返回空"
+            endif
+        endif
+    endif
+endif
+
+@enduml
+    
+
+
+

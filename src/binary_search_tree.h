@@ -5,7 +5,7 @@
 #include <functional>
 #include <utility>
 #include <sstream>
-#include "vector_as_tree.h"
+#include "binary_tree.h"
 
 template <class T>
 struct BSTNode {
@@ -40,6 +40,7 @@ struct BSTSerialize {
 template <class T>
 struct KeyType<BSTNode<T> > {
     typedef T key_type;
+    typedef BSTNoSize has_size_tag;
 };
 
 template <class T, class Comp=std::less<T> > 
@@ -85,13 +86,13 @@ private:
             if (node->right) {
                 add_r (node->right, val);
             } else {
-                node->right = new node_type (value_type(val), node);
+                node->right = new node_type (value_type(val));
             }
         } else if (Comp()(val, curVal)) {
             if (node->left) {
                 add_r (node->left, val);
             } else {
-                node->left = new node_type (value_type(val), node);
+                node->left = new node_type (value_type(val));
             }
         } else {
             node->value.count++;

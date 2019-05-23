@@ -1,0 +1,28 @@
+@startuml
+title 查找P子树中的第K大元素
+
+(*) --> "FindKth(P,K)"
+
+if "K不大于P的左子树中的元素总数?" then
+    -l->[是] if "左子树不为空?" then
+        -l->[是] "递归，返回FindKth(P.left,K)"
+    else
+        -->[否] "返回空"
+    endif
+else
+    -d->[否] if "K不大于左子树元素总数加上P节点元素数量的和?" then
+        -r->[是] "返回P"
+    else
+        -d->[否] if "右子树不为空?" then
+            -r->[是] ”递归调用GetRank(P.right,K-左子树元素总数-P的元素数量)并返回"
+        else
+            -->[否] "返回空"
+        endif
+    endif
+endif
+
+@enduml
+    
+
+
+

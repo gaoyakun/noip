@@ -43,6 +43,7 @@ struct AVLSerialize {
 template <class T>
 struct KeyType<AVLNode<T> > {
     typedef T key_type;
+    typedef BSTHasSize has_size_tag;
 };
 
 template <class T, class Comp=std::less<T> > 
@@ -55,7 +56,7 @@ public:
 public:
     void add (const key_type &val) {
         if (!this->root) {
-            this->root = new node_type (value_type(val), NULL);
+            this->root = new node_type (value_type(val));
         } else {
             this->root = add_r (this->root, val);
         }
@@ -110,9 +111,9 @@ private:
     node_type *add_r (node_type *node, const key_type &val) {
         const key_type &curVal = node->value.value;
         if (Comp()(curVal, val)) {
-            node->right = node->right ? add_r (node->right, val) : new node_type (value_type(val), node);
+            node->right = node->right ? add_r (node->right, val) : new node_type (value_type(val));
         } else if (Comp()(val, curVal)) {
-            node->left = node->left ? add_r (node->left, val) : new node_type (value_type(val), node);
+            node->left = node->left ? add_r (node->left, val) : new node_type (value_type(val));
         } else {
             node->value.count++;
         }

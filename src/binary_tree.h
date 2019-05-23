@@ -16,7 +16,11 @@ struct DefaultSerialize {
 template <class T>
 struct KeyType {
     typedef T key_type;
+    static const int has_size = 0;
 };
+
+struct BSTHasSize {};
+struct BSTNoSize {};
 
 template <class T, class P=DefaultSerialize<T> >
 class BinaryTree {
@@ -25,10 +29,11 @@ public:
     typedef T key_type;
     typedef struct Node {
         typedef typename KeyType<value_type>::key_type key_type;
+        typedef typename KeyType<value_type>::has_size_tag has_size_tag;
         value_type value;
         Node *left;
         Node *right;
-        Node (const value_type &val, Node *p = NULL)
+        Node (const value_type &val)
         : value(val)
         , left(NULL)
         , right(NULL) {
@@ -75,7 +80,7 @@ public:
         }
     }
     template <class Pred>
-    void preorderIterate (node_type *node, const Pred &pred) const {
+    void preorderIterate (node_type *node, Pred &pred) const {
         pred (node->value);
         if (node->left) {
             preorderIterate (node->left, pred);
@@ -85,7 +90,7 @@ public:
         }
     }
     template <class Pred>
-    void inorderIterate (node_type *node, const Pred &pred) const {
+    void inorderIterate (node_type *node, Pred &pred) const {
         if (node->left) {
             inorderIterate (node->left, pred);
         }
@@ -95,7 +100,7 @@ public:
         }
     }
     template <class Pred>
-    void postorderIterate (node_type *node, const Pred &pred) const {
+    void postorderIterate (node_type *node, Pred &pred) const {
         if (node->left) {
             postorderIterate (node->left, pred);
         }

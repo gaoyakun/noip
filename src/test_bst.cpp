@@ -4,6 +4,7 @@
 #include "binary_tree.h"
 #include "binary_search_tree.h"
 #include "avl_tree.h"
+#include "scapegoat_tree.h"
 #include "binary_tree_funcs.h"
 
 using std::cin;
@@ -61,9 +62,11 @@ bool testCase (size_t count) {
 }
 
 int debugBST () {
-	AVLTree<int> bst;
+	ScapeGoatTree<int> bst;
     for (;;) {
         char cmd;
+        cin.clear ();
+        cin.sync ();
         cin >> cmd;
         if (cmd == 'a') {
             int value;
@@ -82,7 +85,7 @@ int debugBST () {
         } else if (cmd == 'k') {
             int k;
             cin >> k;
-            const AVLTree<int>::node_type *node = avl_find_kth (bst.root, k);
+            const ScapeGoatTree<int>::node_type *node = bst_find_kth (bst.root, k);
             if (node) {
                 cout << node->value.value << endl;
             } else {
@@ -91,9 +94,9 @@ int debugBST () {
         } else if (cmd == 'r') {
             int val;
             cin >> val;
-            cout << avl_get_rank (bst.root, val) << endl;
+            cout << bst_get_rank (bst.root, val) << endl;
         } else if (cmd == 'm') {
-            const AVLTree<int>::node_type *node = bst_find_min (bst.root);
+            const ScapeGoatTree<int>::node_type *node = bst_find_min (bst.root);
             if (node) {
                 cout << node->value.value << endl;
             } else {
@@ -102,7 +105,7 @@ int debugBST () {
         } else if (cmd == 'n') {
             int val;
             cin >> val;
-            const AVLTree<int>::node_type *node = bst_get_next (bst.root, val);
+            const ScapeGoatTree<int>::node_type *node = bst_get_next (bst.root, val);
             if (node) {
                 cout << node->value.value << endl;
             } else {
@@ -111,7 +114,7 @@ int debugBST () {
         } else if (cmd == 'p') {
             int val;
             cin >> val;
-            const AVLTree<int>::node_type *node = bst_get_prev (bst.root, val);
+            const ScapeGoatTree<int>::node_type *node = bst_get_prev (bst.root, val);
             if (node) {
                 cout << node->value.value << endl;
             } else {
@@ -130,7 +133,7 @@ int debugBST () {
             }
             tree_print (bst.root);
         } else if (cmd == 'M') {
-            const AVLTree<int>::node_type *node = bst_find_max (bst.root);
+            const ScapeGoatTree<int>::node_type *node = bst_find_max (bst.root);
             if (node) {
                 cout << node->value.value << endl;
             } else {

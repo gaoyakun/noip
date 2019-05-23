@@ -1,0 +1,36 @@
+@startuml
+title 从节点P开始查找元素X的排名
+
+(*) --> "GetRank(P,X)"
+
+if "X小于P的值?" then
+    -l->[是] if "左子树不为空?" then
+        -u->[是] "递归，返回GetRank(P.left,X)"
+    else
+        -->[否] "返回空"
+    endif
+else
+    -d->[否] if "X等于P的值且P的元素数量大于0?" then
+        -r->[是] if "左子树不为空?" then
+            -r->[是] "返回左子树的元素总数量加1"
+        else
+            -u->[否] "返回1"
+        endif
+    else
+        -d->[否] if "右子树不为空?" then
+            -r->[是] "递归获取GetRank(P.right,X)，令其为K"
+            if "K不为空?" then
+                -r->[是] "返回左子树元素总数量+P节点的元素数量+K"
+            else
+                -->[否] "返回空"
+            endif
+        else
+            -->[否] "返回空"
+    endif
+endif
+
+@enduml
+    
+
+
+
