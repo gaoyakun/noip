@@ -75,28 +75,6 @@ public:
     node_type *find (const key_type &val) {
         return this->root ? find_r (this->root, val) : NULL;
     }
-    Treap *split (int k) {
-        if (!this->root) {
-            return 0;
-        } else {
-            couple_type couple = splitNode (this->root, k);
-            if (couple) {
-                this->root = couple.second;
-                return new Treap (couple.first);
-            } else {
-                return 0;
-            }
-        }
-    }
-    void merge (Treap *other) {
-        if (!this->root) {
-            this->root = other->root;
-        } else if (other) {
-            this->root = mergeNode (this->root, other->root);
-            other->root = 0;
-            delete other;
-        }
-    }
 private:
     couple_type splitNode (node_type *root, int k) {
         if (!root) {
