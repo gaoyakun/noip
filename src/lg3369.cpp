@@ -13,7 +13,7 @@ typedef ScapeGoatTree<int> tree_type;
 #include "treap.h"
 typedef Treap<int> tree_type;
 #else
-#error Must define USE_AVL_TREE or USE_SCAPEGOAT_TREE
+#error Must define either USE_AVL_TREE or USE_SCAPEGOAT_TREE or USE_TREAP
 #endif
 
 using std::cin;
