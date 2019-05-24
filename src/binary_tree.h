@@ -49,8 +49,9 @@ private:
     BinaryTree (const BinaryTree&);
     void operator = (const BinaryTree&);
 public:
-    BinaryTree () {
-        root = NULL;
+    BinaryTree (): root(NULL) {
+    }
+    BinaryTree (node_type *p): root(p) {
     }
     virtual ~BinaryTree () {
         clear ();

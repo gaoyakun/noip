@@ -1,11 +1,23 @@
 #include <iostream>
 #include <cstdlib>
 #include "test_common.h"
-#include "binary_tree.h"
-#include "binary_search_tree.h"
-#include "avl_tree.h"
-#include "scapegoat_tree.h"
 #include "binary_tree_funcs.h"
+#include "binary_search_tree.h"
+
+#define USE_SCAPEGOAT_TREE
+
+#ifdef USE_AVL_TREE
+#include "avl_tree.h"
+typedef AVLTree<int> tree_type;
+#elif defined(USE_SCAPEGOAT_TREE)
+#include "scapegoat_tree.h"
+typedef ScapeGoatTree<int> tree_type;
+#elif defined(USE_TREAP)
+#include "treap.h"
+typedef Treap<int> tree_type;
+#else
+#error Must define either USE_AVL_TREE or USE_SCAPEGOAT_REE or USE_TREAP
+#endif
 
 using std::cin;
 using std::cout;
@@ -32,11 +44,11 @@ struct TraverseFunc {
 
 bool testCase (size_t count) {
 	BinarySearchTree<int> bst;
-    AVLTree<int> avl;
+    tree_type bt;
     for (size_t i = 0; i < count; i++) {
 		int val = randRange(-100, 100);
         bst.add (val);
-		avl.add(val);
+		bt.add(val);
     }
 	{
 		TraverseFunc func;
@@ -50,11 +62,11 @@ bool testCase (size_t count) {
 	}
 	{
 		TraverseFunc func;
-		avl.inorderIterate(avl.root, func);
+		bt.inorderIterate(bt.root, func);
 		bool ret = func.ok && func.count_verify == count;
 		if (!ret) {
 			BinaryTreeDebugger debugger;
-			debugger.print_ascii_tree(avl.root);
+			debugger.print_ascii_tree(bt.root);
 			return false;
 		}
 	}
@@ -62,7 +74,7 @@ bool testCase (size_t count) {
 }
 
 int debugBST () {
-	ScapeGoatTree<int> bst;
+	tree_type bst;
     for (;;) {
         char cmd;
         cin.clear ();
@@ -85,7 +97,7 @@ int debugBST () {
         } else if (cmd == 'k') {
             int k;
             cin >> k;
-            const ScapeGoatTree<int>::node_type *node = bst_find_kth (bst.root, k);
+            const tree_type::node_type *node = bst_find_kth (bst.root, k);
             if (node) {
                 cout << node->value.value << endl;
             } else {
@@ -96,7 +108,7 @@ int debugBST () {
             cin >> val;
             cout << bst_get_rank (bst.root, val) << endl;
         } else if (cmd == 'm') {
-            const ScapeGoatTree<int>::node_type *node = bst_find_min (bst.root);
+            const tree_type::node_type *node = bst_find_min (bst.root);
             if (node) {
                 cout << node->value.value << endl;
             } else {
@@ -105,7 +117,7 @@ int debugBST () {
         } else if (cmd == 'n') {
             int val;
             cin >> val;
-            const ScapeGoatTree<int>::node_type *node = bst_get_next (bst.root, val);
+            const tree_type::node_type *node = bst_get_next (bst.root, val);
             if (node) {
                 cout << node->value.value << endl;
             } else {
@@ -114,7 +126,7 @@ int debugBST () {
         } else if (cmd == 'p') {
             int val;
             cin >> val;
-            const ScapeGoatTree<int>::node_type *node = bst_get_prev (bst.root, val);
+            const tree_type::node_type *node = bst_get_prev (bst.root, val);
             if (node) {
                 cout << node->value.value << endl;
             } else {
@@ -133,7 +145,7 @@ int debugBST () {
             }
             tree_print (bst.root);
         } else if (cmd == 'M') {
-            const ScapeGoatTree<int>::node_type *node = bst_find_max (bst.root);
+            const tree_type::node_type *node = bst_find_max (bst.root);
             if (node) {
                 cout << node->value.value << endl;
             } else {

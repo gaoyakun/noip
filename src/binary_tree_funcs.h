@@ -56,15 +56,14 @@ const NodeType *bst_find_kth (const NodeType *root, int k) {
 
 template <class NodeType>
 int bst_get_rank (const NodeType *node, const typename NodeType::key_type &value) {
-    if (value < node->value.value) {
+    if (!node) {
+        return 0;
+    } else if (value < node->value.value) {
         return node->left ? bst_get_rank (node->left, value) : 0;
     } else if (value == node->value.value && node->value.count) {
         return node->left ? node->left->value.size + 1 : 1;
-    } else if (node->right) {
-        int k = bst_get_rank (node->right, value);
-        return k ? k + (node->left ? node->left->value.size + node->value.count : node->value.count) : 0;
     } else {
-        return 0;
+        return bst_get_rank (node->right, value) + (node->left ? node->left->value.size : 0) + node->value.count;
     }
 }
 
