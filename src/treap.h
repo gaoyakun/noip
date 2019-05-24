@@ -59,13 +59,13 @@ public:
     Treap (node_type *p): base_type(p) {
     }
     void add (const key_type &val) {
-        int k = this->root ? getRank (val) : 0;
+        int k = bst_get_rank (this->root, val);
         couple_type c = splitNode (this->root, k);
         node_type *newNode = new node_type(value_type(val));
         this->root = mergeNode (mergeNode(c.first, newNode), c.second);
     }
     void remove (const key_type &val) {
-        int k = getRank (val);
+        int k = bst_get_rank (this->root, val);
         if (k) {
             couple_type x = splitNode (this->root, k-1);
             couple_type y = splitNode (x.second, 1);
@@ -74,20 +74,6 @@ public:
     }
     node_type *find (const key_type &val) {
         return this->root ? find_r (this->root, val) : NULL;
-    }
-    node_type *findKth (int k) const {
-#if 1
-        return bst_find_kth (this->root, k);
-#else
-        couple_type x = splitNode (this->root, k-1);
-        couple_type y = splitNode (x.second, 1);
-        node_type *result = y.first;
-        this->root = mergeNode (mergeNode(x.first, result), y.second);
-        return result;
-#endif
-    }
-    int getRank (const key_type &val) {
-        return bst_get_rank (this->root, val);
     }
     Treap *split (int k) {
         if (!this->root) {

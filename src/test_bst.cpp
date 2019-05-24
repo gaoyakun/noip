@@ -4,7 +4,7 @@
 #include "binary_tree_funcs.h"
 #include "binary_search_tree.h"
 
-#define USE_SCAPEGOAT_TREE
+#define USE_TREAP
 
 #ifdef USE_AVL_TREE
 #include "avl_tree.h"
