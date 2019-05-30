@@ -20,4 +20,4 @@ all: $(TARGETS)
 -include $(DEP)
 
 clean:
-	-rm -rf $(TARGETS) *.o *.d *.dSYM
+	-rm -rf $(TARGETS) *.o *.d *.dSYM *.exe *.obj

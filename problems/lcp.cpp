@@ -1,18 +1,16 @@
 #include <string>
 #include <vector>
-#include "judge.h"
+#include <stdexcept>
 
 using std::string;
 using std::vector;
+using std::runtime_error;
 
-/** æ±‚ç»™å®šçš„å­—ç¬¦ä¸²æ•°ç»„ä¸­æ‰€æœ‰å­—ç¬¦ä¸²çš„æœ€é•¿å…¬å…±å‰ç¼€
- * å‚æ•° strList: å­—ç¬¦ä¸²æ•°ç»„
- * è¿”å›å€¼: æœ€é•¿å…¬å…±å‰ç¼€ï¼Œä¸å­˜åœ¨åˆ™è¿”å›ç©ºå­—ç¬¦ä¸²
+/** Çó¸ø¶¨µÄ×Ö·û´®Êı×éÖĞËùÓĞ×Ö·û´®µÄ×î³¤¹«¹²Ç°×º
+ * ²ÎÊı strList: ×Ö·û´®Êı×é
+ * ·µ»ØÖµ: ×î³¤¹«¹²Ç°×º£¬²»´æÔÚÔò·µ»Ø¿Õ×Ö·û´®
  */
 string solution (const vector<string> &strList) {
-
-}
-
-int main () {
-
+	return "";
+	//throw runtime_error("Not implemented");
 }
