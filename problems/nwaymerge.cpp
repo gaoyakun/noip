@@ -15,7 +15,7 @@ struct Comp {
 /** 多路归并排序，将给定的k组从小到大排列的有序数列合并为一组有序数列 
  * 参数 numbers: 长度为k的数组，每个元素是一个长度为Sk的有序数组，数组内每个数字大小介于0到10000之间 
  * 参数 result: 空数组，请将合并结果存入这个数组 
- * 数据规模：k<=2000, Sk<=10000
+ * 数据规模：k<=1600, Sk<=1000
  */
 void solution (const vector<vector<int> > &numbers, vector<int> &result) {
 	priority_queue<int, vector<int>, Comp> q;

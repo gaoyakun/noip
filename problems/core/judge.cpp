@@ -36,12 +36,12 @@ void Judge::executeContext (TestContext *ctx) {
     int n = 0;
     std::cout << "Judging " << ctx->name() << "..." << std::flush;
     while (true) {
-        sprintf (inFile, "data\\%s%d.in", ctx->name(), n+1);
+        sprintf (inFile, "data/%s%d.in", ctx->name(), n+1);
         std::ifstream is(inFile);      
         if (!is.is_open ()) {
             break;
         }
-        sprintf (outFile, "data\\%s%d.out", ctx->name(), n+1);
+        sprintf (outFile, "data/%s%d.out", ctx->name(), n+1);
         std::ifstream is_out(outFile);
         if (!is_out.is_open()) {
             break;

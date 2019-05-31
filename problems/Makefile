@@ -21,4 +21,4 @@ $(OBJ): %.o: %.cpp
 -include $(DEP)
 
 clean:
-	-rm -rf $(TARGETS) *.o *.d *.dSYM *.exe *.obj core/*.o core/*.d core/*.dSYM core/*.exe core/*.obj
+	-rm -rf main *.o *.d *.dSYM *.exe *.obj core/*.o core/*.d core/*.dSYM core/*.exe core/*.obj

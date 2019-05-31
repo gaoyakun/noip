@@ -6,11 +6,10 @@ using std::string;
 using std::vector;
 using std::runtime_error;
 
-/** 求给定的字符串数组中所有字符串的最长公共前缀
+/** 给定一组字符串，求它们的最长公共前缀
  * 参数 strList: 字符串数组
- * 返回值: 最长公共前缀，不存在则返回空字符串
+ * 返回值: 最长公共前缀
  */
 string solution (const vector<string> &strList) {
-	return "";
-	//throw runtime_error("Not implemented");
+	throw runtime_error("Not implemented");
 }
