@@ -5,3 +5,5 @@
 **/*.d
 **/*.exe
 **/*.obj
+problems/Makefile.win
+problems/judge.layout

@@ -4,8 +4,8 @@
 CPP      = g++.exe -D__DEBUG__
 CC       = gcc.exe -D__DEBUG__
 WINDRES  = windres.exe
-OBJ      = core/judge.o core/main.o core/p_lcp.o core/p_nwaymerge.o lcp.o nwaymerge.o
-LINKOBJ  = core/judge.o core/main.o core/p_lcp.o core/p_nwaymerge.o lcp.o nwaymerge.o
+OBJ      = core/judge.o core/main.o nwaymerge.o ticket.o toys.o
+LINKOBJ  = core/judge.o core/main.o nwaymerge.o ticket.o toys.o
 LIBS     = -L"C:/Program Files (x86)/Dev-Cpp/MinGW64/lib" -L"C:/Program Files (x86)/Dev-Cpp/MinGW64/x86_64-w64-mingw32/lib" -static-libgcc -g3
 INCS     = -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/include" -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/x86_64-w64-mingw32/include" -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/lib/gcc/x86_64-w64-mingw32/4.9.2/include"
 CXXINCS  = -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/include" -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/x86_64-w64-mingw32/include" -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/lib/gcc/x86_64-w64-mingw32/4.9.2/include" -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/lib/gcc/x86_64-w64-mingw32/4.9.2/include/c++"
@@ -30,14 +30,11 @@ core/judge.o: core/judge.cpp
 core/main.o: core/main.cpp
 	$(CPP) -c core/main.cpp -o core/main.o $(CXXFLAGS)
 
-core/p_lcp.o: core/p_lcp.cpp
-	$(CPP) -c core/p_lcp.cpp -o core/p_lcp.o $(CXXFLAGS)
-
-core/p_nwaymerge.o: core/p_nwaymerge.cpp
-	$(CPP) -c core/p_nwaymerge.cpp -o core/p_nwaymerge.o $(CXXFLAGS)
-
-lcp.o: lcp.cpp
-	$(CPP) -c lcp.cpp -o lcp.o $(CXXFLAGS)
-
 nwaymerge.o: nwaymerge.cpp
 	$(CPP) -c nwaymerge.cpp -o nwaymerge.o $(CXXFLAGS)
+
+ticket.o: ticket.cpp
+	$(CPP) -c ticket.cpp -o ticket.o $(CXXFLAGS)
+
+toys.o: toys.cpp
+	$(CPP) -c toys.cpp -o toys.o $(CXXFLAGS)
