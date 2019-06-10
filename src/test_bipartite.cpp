@@ -6,3 +6,6 @@ using std::cout;
 using std::endl;
 using graph::AdjacentMatrix;
 
+int main () {
+    return 0;
+}
